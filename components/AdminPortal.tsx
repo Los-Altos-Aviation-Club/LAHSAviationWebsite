@@ -88,9 +88,18 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
         setIsLoading(true);
         setError('');
 
+        const adminPasskey = import.meta.env.VITE_ADMIN_PASSKEY;
+
+        if (!adminPasskey) {
+            console.error('VITE_ADMIN_PASSKEY is not defined in the environment.');
+            setError('System configuration error: Passkey missing.');
+            setIsLoading(false);
+            return;
+        }
+
         // Simulate network verification delay
         setTimeout(() => {
-            if (password === import.meta.env.VITE_ADMIN_PASSKEY) {
+            if (password === adminPasskey) {
                 setIsSuccess(true);
                 setTimeout(() => {
                     setIsAdmin(true);
