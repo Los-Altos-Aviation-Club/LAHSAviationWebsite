@@ -256,8 +256,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
             <div className="min-h-screen bg-surface flex items-center justify-center p-4">
                 <div className="w-full max-w-sm space-y-8 bg-white p-8 rounded-2xl shadow-soft">
                     <div className="text-center">
-                        <h1 className="text-2xl font-semibold text-contrast tracking-tight">Pilot Access</h1>
-                        <p className="text-sm text-secondary mt-2">Please enter the flight command passkey.</p>
+                        <h1 className="text-2xl font-semibold text-contrast tracking-tight">Admin Access</h1>
+                        <p className="text-sm text-secondary mt-2">Please enter the Admin passkey.</p>
                     </div>
                     <form onSubmit={handleLogin} className="space-y-6">
                         <div className="space-y-2">
