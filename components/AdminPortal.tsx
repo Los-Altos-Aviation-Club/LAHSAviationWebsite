@@ -19,6 +19,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
     const [activeTab, setActiveTab] = useState<'projects' | 'events' | 'settings'>('projects');
     const [githubToken, setGithubToken] = useState<string>(() => localStorage.getItem('gh_pat') || '');
     const [initStatus, setInitStatus] = useState<Record<string, 'loading' | 'success' | 'error' | 'none'>>({});
+    const [isBulkSyncing, setIsBulkSyncing] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [saveError, setSaveError] = useState('');
 
@@ -144,15 +145,35 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
             }
 
             setInitStatus(prev => ({ ...prev, [project.id]: 'success' }));
-            setTimeout(() => {
-                setInitStatus(prev => ({ ...prev, [project.id]: 'none' }));
-            }, 3000);
-
+            return true;
         } catch (err) {
             console.error('Initialization error:', err);
             setInitStatus(prev => ({ ...prev, [project.id]: 'error' }));
-            alert('Error initializing folders. Check console and verify your PAT permissions.');
+            return false;
         }
+    };
+
+    const handleBulkSync = async () => {
+        if (!githubToken) {
+            alert('Please add a GitHub Personal Access Token in the Settings tab first.');
+            setActiveTab('settings');
+            return;
+        }
+
+        if (!confirm('This will ensure all project folders exist in the Archive repository. Proceed?')) {
+            return;
+        }
+
+        setIsBulkSyncing(true);
+        let successCount = 0;
+
+        for (const project of data.projects) {
+            const success = await initializeArchiveFolders(project);
+            if (success) successCount++;
+        }
+
+        setIsBulkSyncing(false);
+        alert(`Bulk sync complete. ${successCount}/${data.projects.length} projects ensured.`);
     };
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -382,7 +403,18 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                     {/* Projects */}
                     {activeTab === 'projects' && (
                         <div className="space-y-6">
-                            <div className="flex justify-end">
+                            <div className="flex justify-end items-center gap-3">
+                                <button
+                                    onClick={handleBulkSync}
+                                    disabled={isBulkSyncing}
+                                    className="bg-surface hover:bg-gray-100 text-secondary border border-gray-200 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm disabled:opacity-50"
+                                >
+                                    {isBulkSyncing ? (
+                                        <><Loader2 className="w-4 h-4 animate-spin" /> Syncing...</>
+                                    ) : (
+                                        <><RefreshCw className="w-4 h-4" /> Sync All Projects</>
+                                    )}
+                                </button>
                                 <button onClick={handleAddProject} className="bg-white hover:bg-gray-50 text-contrast border border-gray-200 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm">
                                     <Plus className="w-4 h-4" /> Add Project
                                 </button>

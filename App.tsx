@@ -140,7 +140,23 @@ const MainContent: React.FC = () => {
                 const response = await fetch(`${ARCHIVE_RAW_BASE_URL}/metadata.json`);
                 if (response.ok) {
                     const remoteData = await response.json();
-                    setData(remoteData);
+
+                    // Deep merge remote data with initial data to prevent missing field crashes
+                    setData(prev => ({
+                        ...prev,
+                        ...remoteData,
+                        siteContent: {
+                            ...prev.siteContent,
+                            ...(remoteData.siteContent || {})
+                        },
+                        // Ensure arrays exist if remote data is partial
+                        projects: remoteData.projects || prev.projects,
+                        officers: remoteData.officers || prev.officers,
+                        events: remoteData.events || prev.events,
+                        pillars: remoteData.pillars || prev.pillars,
+                        tickerItems: remoteData.tickerItems || prev.tickerItems
+                    }));
+
                     console.log('Loaded data from Archive Repository');
                 } else {
                     console.warn('Failed to fetch metadata from Archive, using initial data');

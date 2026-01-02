@@ -119,3 +119,29 @@ The Admin Portal requires a PAT to push updates to the archive repository.
 1.  Wait for the GitHub Action (under the **Actions** tab) to complete.
 2.  Visit `https://lahsaviation.dpdns.org`.
 3.  Test the Admin Portal by navigating to `/admin` and logging in with your `VITE_ADMIN_PASSKEY` and PAT.
+
+---
+
+## 8. Setting up the 2nd Repository (Project Archive)
+
+The **Archive Repository** acts as the central database for project logs, images, and configuration.
+
+-   **Name**: `AviationProjectArchive` (Ensure this matches `ARCHIVE_REPO` in `constants.ts`).
+-   **Structure**:
+    -   `metadata.json`: The core data file containing all projects, events, and settings.
+    -   `/projects/`: A folder containing sub-folders for each project (named by their ID/slug).
+-   **Initial Setup**:
+    1.  Create the repository on GitHub.
+    2.  Upload the initial `metadata.json` from the root of this project to the repository.
+    3.  Create an empty folder named `projects` with a `.gitkeep` file inside to ensure it exists.
+
+### Usage & Updates:
+-   **Via Admin Portal (Recommended)**:
+    -   Use the **"Sync All Projects"** button in the Admin Portal to automatically create the necessary folder structure for all existing projects.
+    -   When adding a new project, click **"Initialize Archive"** on that specific project to set up its folder.
+    -   Always click **"Save to GitHub"** after making changes to persist `metadata.json`.
+-   **Manual Updates (Advanced)**:
+    -   You can manually add update folders inside `/projects/[project-slug]/`.
+    -   Folders should be named `YYYY-MM-DD-Title`.
+    -   Inside each update folder, place a `desc.txt` for the log text and any images/videos for the gallery.
+    -   The website automatically scans these folders to build the project timelines.
