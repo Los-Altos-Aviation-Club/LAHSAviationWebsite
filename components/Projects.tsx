@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { ClubData, Project } from '../types';
-import { ArrowRight, ChevronLeft, Tag, FileText, Layout, Image as ImageIcon } from 'lucide-react';
+import { ArrowRight, ChevronLeft, Tag, FileText, Layout, Image as ImageIcon, Calendar } from 'lucide-react';
 import EditableText from './EditableText';
 import EditableImage from './EditableImage';
-import { GITHUB_RAW_BASE_URL, GITHUB_API_BASE_URL } from '../constants';
+import { GITHUB_RAW_BASE_URL, GITHUB_API_BASE_URL, PROJECTS_BASE_PATH } from '../constants';
+
+interface ProjectUpdate {
+    id: string;
+    date: string;
+    title: string;
+    description: string;
+    media: { name: string, url: string, type: string }[];
+}
 
 interface ProjectsProps {
     data: ClubData;
@@ -13,71 +21,95 @@ interface ProjectsProps {
 
 const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) => {
     const [selectedId, setSelectedId] = useState<string | null>(null);
-    const [activeProjectView, setActiveProjectView] = useState<'details' | 'logs' | 'media'>('details');
-    const [logContent, setLogContent] = useState<string>('');
-    const [isLoadingLog, setIsLoadingLog] = useState(false);
-    const [projectMedia, setProjectMedia] = useState<{ name: string, url: string, type: string }[]>([]);
-    const [isLoadingMedia, setIsLoadingMedia] = useState(false);
+    const [activeProjectView, setActiveProjectView] = useState<'details' | 'updates'>('details');
+    const [projectUpdates, setProjectUpdates] = useState<ProjectUpdate[]>([]);
+    const [isLoadingUpdates, setIsLoadingUpdates] = useState(false);
 
     const selectedProject = data.projects.find(p => p.id === selectedId);
 
+    const slugify = (text: string) => {
+        return text
+            .toString()
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-')     // Replace spaces with -
+            .replace(/[^\w-]+/g, '')  // Remove all non-word chars
+            .replace(/--+/g, '-');    // Replace multiple - with single -
+    };
+
     useEffect(() => {
-        if (selectedId) {
-            if (activeProjectView === 'logs') {
-                fetchLogContent(selectedId);
-            } else if (activeProjectView === 'media') {
-                fetchProjectMedia(selectedId);
-            }
+        if (selectedId && activeProjectView === 'updates') {
+            fetchProjectUpdates(selectedId);
         }
     }, [selectedId, activeProjectView]);
 
-    const fetchLogContent = async (projectId: string) => {
-        setIsLoadingLog(true);
+    const fetchProjectUpdates = async (projectId: string) => {
+        setIsLoadingUpdates(true);
+        const project = data.projects.find(p => p.id === projectId);
+        if (!project) return;
+        const slug = slugify(project.title);
+
         try {
-            // 1. Attempt local fetch
-            let response = await fetch(`/logs/${projectId}.md`);
-
-            // 2. If local fails, attempt external repo fetch
-            if (!response.ok) {
-                response = await fetch(`${GITHUB_RAW_BASE_URL}/logs/${projectId}.md`);
-            }
-
+            // Fetch subfolders in /projects/[project-slug]/
+            const response = await fetch(`${GITHUB_API_BASE_URL}/${PROJECTS_BASE_PATH}/${slug}`);
             if (response.ok) {
-                const text = await response.text();
-                setLogContent(text);
+                const contents = await response.json();
+                const updateFolders = contents.filter((item: any) => item.type === 'dir');
+
+                const fetchedUpdates = await Promise.all(updateFolders.map(async (folder: any) => {
+                    // Fetch desc.txt
+                    let description = 'No description available.';
+                    try {
+                        const descRes = await fetch(`${GITHUB_RAW_BASE_URL}/${PROJECTS_BASE_PATH}/${slug}/${folder.name}/desc.txt`);
+                        if (descRes.ok) {
+                            description = await descRes.text();
+                        }
+                    } catch (e) {
+                        console.error('Error fetching desc.txt', e);
+                    }
+
+                    // Fetch media in subfolder
+                    let media: { name: string, url: string, type: string }[] = [];
+                    try {
+                        const mediaRes = await fetch(`${GITHUB_API_BASE_URL}/${PROJECTS_BASE_PATH}/${slug}/${folder.name}`);
+                        if (mediaRes.ok) {
+                            const mediaFiles = await mediaRes.json();
+                            media = mediaFiles
+                                .filter((file: any) => file.type === 'file' && /\.(jpe?g|png|gif|mp4|webm)$/i.test(file.name))
+                                .map((file: any) => ({
+                                    name: file.name,
+                                    url: file.download_url,
+                                    type: file.name.match(/\.(mp4|webm)$/i) ? 'video' : 'image'
+                                }));
+                        }
+                    } catch (e) {
+                        console.error('Error fetching update media', e);
+                    }
+
+                    // Parse folder name for date and title: YYYY-MM-DD-Title
+                    const dateMatch = folder.name.match(/^(\d{4}-\d{2}-\d{2})-(.*)$/);
+                    const date = dateMatch ? dateMatch[1] : 'Unknown Date';
+                    const title = dateMatch ? dateMatch[2].replace(/-/g, ' ') : folder.name.replace(/-/g, ' ');
+
+                    return {
+                        id: folder.name,
+                        date,
+                        title,
+                        description,
+                        media
+                    };
+                }));
+
+                // Sort updates chronologically (newest first)
+                setProjectUpdates(fetchedUpdates.sort((a, b) => b.date.localeCompare(a.date)));
             } else {
-                setLogContent('No documentation found for this project yet. Stay tuned for updates from the engineering team.');
+                setProjectUpdates([]);
             }
         } catch (error) {
-            setLogContent('Error loading project logs.');
+            console.error('Error fetching project updates:', error);
+            setProjectUpdates([]);
         } finally {
-            setIsLoadingLog(false);
-        }
-    };
-
-    const fetchProjectMedia = async (projectId: string) => {
-        setIsLoadingMedia(true);
-        try {
-            // Fetch file list from GitHub Contents API
-            const response = await fetch(`${GITHUB_API_BASE_URL}/media/${projectId}`);
-            if (response.ok) {
-                const files = await response.json();
-                const mediaItems = files
-                    .filter((file: any) => file.type === 'file' && /\.(jpe?g|png|gif|mp4|webm)$/i.test(file.name))
-                    .map((file: any) => ({
-                        name: file.name,
-                        url: file.download_url,
-                        type: file.name.match(/\.(mp4|webm)$/i) ? 'video' : 'image'
-                    }));
-                setProjectMedia(mediaItems);
-            } else {
-                setProjectMedia([]);
-            }
-        } catch (error) {
-            console.error('Error fetching project media:', error);
-            setProjectMedia([]);
-        } finally {
-            setIsLoadingMedia(false);
+            setIsLoadingUpdates(false);
         }
     };
 
@@ -112,16 +144,10 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
                                     <Layout className="w-3.5 h-3.5" /> Specifications
                                 </button>
                                 <button
-                                    onClick={() => setActiveProjectView('logs')}
-                                    className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${activeProjectView === 'logs' ? 'bg-white text-primary shadow-sm' : 'text-secondary hover:text-contrast'}`}
+                                    onClick={() => setActiveProjectView('updates')}
+                                    className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${activeProjectView === 'updates' ? 'bg-white text-primary shadow-sm' : 'text-secondary hover:text-contrast'}`}
                                 >
-                                    <FileText className="w-3.5 h-3.5" /> Project Logs
-                                </button>
-                                <button
-                                    onClick={() => setActiveProjectView('media')}
-                                    className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${activeProjectView === 'media' ? 'bg-white text-primary shadow-sm' : 'text-secondary hover:text-contrast'}`}
-                                >
-                                    <ImageIcon className="w-3.5 h-3.5" /> Media Gallery
+                                    <Calendar className="w-3.5 h-3.5" /> Project Updates
                                 </button>
                             </div>
 
@@ -134,71 +160,66 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
                                     {/* ... image and text content ... */}
                                     {/* (Rest of details view remains the same) */}
                                 </div>
-                            ) : activeProjectView === 'logs' ? (
+                            ) : (
                                 <div className="max-w-4xl mx-auto animate-fade-in">
                                     <div className="flex items-center justify-between mb-12">
                                         <div>
-                                            <h2 className="text-4xl font-bold text-contrast mb-2">{selectedProject.title} Engineering Log</h2>
-                                            <p className="text-secondary font-mono text-sm">ARCHIVE_TYPE: MARKDOWN_DOCUMENTATION</p>
+                                            <h2 className="text-4xl font-bold text-contrast mb-2">{selectedProject.title} Development Updates</h2>
+                                            <p className="text-secondary font-mono text-sm">ARCHIVE_TYPE: NESTED_TIMELINE_REPOSITORY</p>
                                         </div>
                                         <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
-                                            <FileText className="w-6 h-6" />
+                                            <Calendar className="w-6 h-6" />
                                         </div>
                                     </div>
 
-                                    {isLoadingLog ? (
+                                    {isLoadingUpdates ? (
                                         <div className="flex flex-col items-center justify-center py-20 space-y-4">
                                             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                                            <p className="text-secondary font-mono text-xs">DECRYPTING ARCHIVES...</p>
+                                            <p className="text-secondary font-mono text-xs">SYNCHRONIZING TIMELINE...</p>
                                         </div>
-                                    ) : (
-                                        <div className="bg-white border border-gray-100 rounded-3xl p-8 md:p-12 shadow-sm min-h-[400px]">
-                                            <div className="prose prose-blue max-w-none prose-headings:text-contrast prose-p:text-secondary prose-strong:text-contrast">
-                                                {/* In a real app, we would use a markdown library like react-markdown */}
-                                                <pre className="whitespace-pre-wrap font-sans text-lg leading-relaxed">
-                                                    {logContent}
-                                                </pre>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="max-w-6xl mx-auto animate-fade-in">
-                                    <div className="flex items-center justify-between mb-12">
-                                        <div>
-                                            <h2 className="text-4xl font-bold text-contrast mb-2">{selectedProject.title} Media Gallery</h2>
-                                            <p className="text-secondary font-mono text-sm">ARCHIVE_TYPE: EXTERNAL_CONTENT_REPOSITORY</p>
-                                        </div>
-                                        <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
-                                            <ImageIcon className="w-6 h-6" />
-                                        </div>
-                                    </div>
+                                    ) : projectUpdates.length > 0 ? (
+                                        <div className="relative border-l-2 border-gray-100 ml-4 md:ml-8 pl-8 md:pl-12 space-y-16 py-4">
+                                            {projectUpdates.map((update, idx) => (
+                                                <div key={update.id} className="relative">
+                                                    {/* Timeline Dot */}
+                                                    <div className="absolute -left-[41px] md:-left-[57px] top-0 w-4 h-4 rounded-full bg-white border-4 border-primary shadow-[0_0_10px_rgba(59,130,246,0.5)] z-10"></div>
 
-                                    {isLoadingMedia ? (
-                                        <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                                            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                                            <p className="text-secondary font-mono text-xs">INDEXING REMOTE ASSETS...</p>
-                                        </div>
-                                    ) : projectMedia.length > 0 ? (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                            {projectMedia.map((item, idx) => (
-                                                <div key={idx} className="group relative bg-surface rounded-2xl overflow-hidden border border-gray-100 aspect-video shadow-sm hover:shadow-md transition-all">
-                                                    {item.type === 'image' ? (
-                                                        <img src={item.url} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
-                                                    ) : (
-                                                        <video src={item.url} className="w-full h-full object-cover" controls />
-                                                    )}
-                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                                                        <p className="text-white font-mono text-[10px] truncate">{item.name}</p>
+                                                    <div className="space-y-4">
+                                                        <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                                                            <span className="font-mono text-sm text-primary font-bold bg-primary/5 px-3 py-1 rounded-full w-fit">
+                                                                {update.date}
+                                                            </span>
+                                                            <h3 className="text-2xl font-bold text-contrast capitalize">{update.title}</h3>
+                                                        </div>
+
+                                                        <div className="bg-white border border-gray-100 rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow">
+                                                            <div className="prose prose-blue max-w-none prose-p:text-secondary prose-p:leading-relaxed text-lg whitespace-pre-wrap font-sans">
+                                                                {update.description}
+                                                            </div>
+
+                                                            {update.media.length > 0 && (
+                                                                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                                    {update.media.map((item, mIdx) => (
+                                                                        <div key={mIdx} className="group relative bg-surface rounded-xl overflow-hidden border border-gray-100 aspect-video shadow-sm">
+                                                                            {item.type === 'image' ? (
+                                                                                <img src={item.url} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
+                                                                            ) : (
+                                                                                <video src={item.url} className="w-full h-full object-cover" controls />
+                                                                            )}
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
                                     ) : (
                                         <div className="bg-white border border-dashed border-gray-200 rounded-3xl p-20 text-center">
-                                            <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                                            <h3 className="text-lg font-medium text-contrast">No media found</h3>
-                                            <p className="text-secondary mt-2">Add assets to the /media/{selectedProject.id} folder in the content repository.</p>
+                                            <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                                            <h3 className="text-lg font-medium text-contrast">No updates found</h3>
+                                            <p className="text-secondary mt-2">Create dated folders in <code>/projects/{slugify(selectedProject.title)}/</code> to add logs.</p>
                                         </div>
                                     )}
                                 </div>

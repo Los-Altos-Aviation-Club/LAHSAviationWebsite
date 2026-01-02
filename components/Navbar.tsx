@@ -88,19 +88,12 @@ const Navbar: React.FC<NavbarProps> = ({ isAdmin, isGameMode = false }) => {
                             </button>
                         ))}
 
-                        {isAdmin ? (
+                        {isAdmin && (
                             <button
                                 onClick={() => handleNavClick('/admin')}
                                 className={`ml-4 px-5 py-2 text-xs font-semibold rounded-full transition-colors flex items-center gap-2 shadow-lg ${isGameMode ? 'bg-[#39ff14] text-black hover:bg-[#32cd11]' : 'bg-primary text-white hover:bg-primary-dark shadow-blue-500/20'}`}
                             >
                                 <LayoutDashboard className="w-3 h-3" /> {isGameMode ? 'CMD' : 'Dashboard'}
-                            </button>
-                        ) : (
-                            <button
-                                onClick={() => handleNavClick('/admin')}
-                                className={`ml-4 px-5 py-2 text-xs font-semibold rounded-full transition-colors flex items-center gap-2 shadow-lg ${isGameMode ? 'bg-transparent border border-[#39ff14] text-[#39ff14] hover:bg-[#39ff14]/10' : 'bg-contrast text-white hover:bg-black/80 shadow-black/5'}`}
-                            >
-                                <Compass className="w-3 h-3" /> {isGameMode ? 'ADMIN_LOGIN' : 'Admin Login'}
                             </button>
                         )}
                     </div>
@@ -140,15 +133,17 @@ const Navbar: React.FC<NavbarProps> = ({ isAdmin, isGameMode = false }) => {
                         {link.name}
                     </button>
                 ))}
-                <button
-                    onClick={() => handleNavClick('/admin')}
-                    className={`text-lg mt-8 font-mono border px-6 py-2 rounded-lg flex items-center gap-2 ${isGameMode
-                        ? 'text-[#39ff14] border-[#39ff14] hover:bg-[#39ff14]/10'
-                        : (isAdmin ? 'text-primary border-primary' : 'text-secondary border-gray-200')
-                        }`}
-                >
-                    {isAdmin ? 'DASHBOARD' : 'SYSTEM_LOGIN'}
-                </button>
+                {isAdmin ? (
+                    <button
+                        onClick={() => handleNavClick('/admin')}
+                        className={`text-lg mt-8 font-mono border px-6 py-2 rounded-lg flex items-center gap-2 ${isGameMode
+                            ? 'text-[#39ff14] border-[#39ff14] hover:bg-[#39ff14]/10'
+                            : 'text-primary border-primary'
+                            }`}
+                    >
+                        DASHBOARD
+                    </button>
+                ) : null}
             </div>
         </nav>
     );

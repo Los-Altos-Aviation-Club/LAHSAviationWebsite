@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { ClubData, Project, Event } from '../types';
-import { LogOut, Plus, Trash2, ChevronLeft, Loader2, CheckCircle, AlertCircle, Image as ImageIcon, RefreshCw, Github, FolderPlus, ExternalLink } from 'lucide-react';
+import { LogOut, Plus, Trash2, ChevronLeft, Loader2, CheckCircle, AlertCircle, Image as ImageIcon, RefreshCw, Github, FolderPlus, Save, Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { CONTENT_REPO, GITHUB_API_BASE_URL } from '../constants';
+import { ARCHIVE_REPO, ARCHIVE_GITHUB_API_BASE_URL, PROJECTS_BASE_PATH } from '../constants';
 
 interface AdminPortalProps {
     data: ClubData;
@@ -19,20 +19,33 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
     const [activeTab, setActiveTab] = useState<'projects' | 'events' | 'settings'>('projects');
     const [githubToken, setGithubToken] = useState<string>(() => localStorage.getItem('gh_pat') || '');
     const [initStatus, setInitStatus] = useState<Record<string, 'loading' | 'success' | 'error' | 'none'>>({});
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [saveError, setSaveError] = useState('');
+
+    const slugify = (text: string) => {
+        return text
+            .toString()
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-')     // Replace spaces with -
+            .replace(/[^\w-]+/g, '')  // Remove all non-word chars
+            .replace(/--+/g, '-');    // Replace multiple - with single -
+    };
 
     const handleTokenChange = (token: string) => {
         setGithubToken(token);
         localStorage.setItem('gh_pat', token);
     };
 
-    const initializeArchiveFolders = async (projectId: string) => {
+    const handleSaveToGitHub = async () => {
         if (!githubToken) {
             alert('Please add a GitHub Personal Access Token in the Settings tab first.');
             setActiveTab('settings');
             return;
         }
 
-        setInitStatus(prev => ({ ...prev, [projectId]: 'loading' }));
+        setSaveStatus('loading');
+        setSaveError('');
 
         try {
             const headers = {
@@ -41,42 +54,95 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                 'Content-Type': 'application/json',
             };
 
-            const foldersToCreate = [
-                `logs/${projectId}.md`,
-                `media/${projectId}/.gitkeep`
+            // 1. Get the current SHA of metadata.json from ARCHIVE
+            const getRes = await fetch(`${ARCHIVE_GITHUB_API_BASE_URL}/metadata.json`, { headers });
+            if (!getRes.ok) throw new Error('Failed to fetch metadata.json from Archive Repository');
+            const fileData = await getRes.json();
+            const currentSha = fileData.sha;
+
+            // 2. Prepare the new content
+            const content = btoa(JSON.stringify(data, null, 2));
+
+            // 3. Update the file in ARCHIVE
+            const updateRes = await fetch(`${ARCHIVE_GITHUB_API_BASE_URL}/metadata.json`, {
+                method: 'PUT',
+                headers,
+                body: JSON.stringify({
+                    message: `Update metadata.json from Admin Portal [${new Date().toISOString()}]`,
+                    content: content,
+                    sha: currentSha
+                })
+            });
+
+            if (!updateRes.ok) {
+                const errorData = await updateRes.json();
+                throw new Error(errorData.message || 'Failed to update metadata.json');
+            }
+
+            setSaveStatus('success');
+            setTimeout(() => setSaveStatus('idle'), 5000);
+
+        } catch (err: any) {
+            console.error('Save error:', err);
+            setSaveStatus('error');
+            setSaveError(err.message || 'An unknown error occurred while saving.');
+        }
+    };
+
+    const initializeArchiveFolders = async (project: Project) => {
+        if (!githubToken) {
+            alert('Please add a GitHub Personal Access Token in the Settings tab first.');
+            setActiveTab('settings');
+            return;
+        }
+
+        const slug = slugify(project.title);
+        const date = new Date().toISOString().split('T')[0];
+        const initialFolderPath = `${PROJECTS_BASE_PATH}/${slug}/${date}-Project-Initialized`;
+
+        setInitStatus(prev => ({ ...prev, [project.id]: 'loading' }));
+
+        try {
+            const headers = {
+                'Authorization': `token ${githubToken}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json',
+            };
+
+            const filesToCreate = [
+                { path: `${PROJECTS_BASE_PATH}/${slug}/.gitkeep`, content: '' },
+                { path: `${initialFolderPath}/desc.txt`, content: 'Project initialized.' }
             ];
 
-            for (const path of foldersToCreate) {
-                // Check if file exists
-                const checkRes = await fetch(`${GITHUB_API_BASE_URL}/${path}`, { headers });
+            for (const file of filesToCreate) {
+                // Check if file exists in ARCHIVE
+                const checkRes = await fetch(`${ARCHIVE_GITHUB_API_BASE_URL}/${file.path}`, { headers });
 
                 if (checkRes.status === 404) {
-                    // Create placeholder file to "create" the folder
-                    const content = path.endsWith('.md')
-                        ? btoa(`# Logs for Project ${projectId}\n\nInitialize your first log entry here.`)
-                        : btoa('');
+                    // Create placeholder file to "create" the folder in ARCHIVE
+                    const content = btoa(file.content);
 
-                    const createRes = await fetch(`${GITHUB_API_BASE_URL}/${path}`, {
+                    const createRes = await fetch(`${ARCHIVE_GITHUB_API_BASE_URL}/${file.path}`, {
                         method: 'PUT',
                         headers,
                         body: JSON.stringify({
-                            message: `Initialize archive for project ${projectId}`,
+                            message: `Initialize project archive for ${slug}`,
                             content: content
                         })
                     });
 
-                    if (!createRes.ok) throw new Error(`Failed to create ${path}`);
+                    if (!createRes.ok) throw new Error(`Failed to create ${file.path}`);
                 }
             }
 
-            setInitStatus(prev => ({ ...prev, [projectId]: 'success' }));
+            setInitStatus(prev => ({ ...prev, [project.id]: 'success' }));
             setTimeout(() => {
-                setInitStatus(prev => ({ ...prev, [projectId]: 'none' }));
+                setInitStatus(prev => ({ ...prev, [project.id]: 'none' }));
             }, 3000);
 
         } catch (err) {
             console.error('Initialization error:', err);
-            setInitStatus(prev => ({ ...prev, [projectId]: 'error' }));
+            setInitStatus(prev => ({ ...prev, [project.id]: 'error' }));
             alert('Error initializing folders. Check console and verify your PAT permissions.');
         }
     };
@@ -221,18 +287,60 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
             <div className="max-w-5xl mx-auto">
                 <div className="flex justify-between items-center mb-12">
                     <h1 className="text-3xl font-semibold text-contrast">Website Control</h1>
-                    <button
-                        onClick={() => setIsAdmin(false)}
-                        className="text-sm text-secondary hover:text-contrast flex items-center gap-2"
-                    >
-                        <LogOut className="w-4 h-4" /> Sign out
-                    </button>
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={handleSaveToGitHub}
+                            disabled={saveStatus === 'loading'}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-lg ${saveStatus === 'success' ? 'bg-green-500 text-white shadow-green-500/20' :
+                                saveStatus === 'error' ? 'bg-red-500 text-white shadow-red-500/20' :
+                                    'bg-primary text-white hover:bg-blue-600 shadow-primary/20'
+                                } ${saveStatus === 'loading' ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        >
+                            {saveStatus === 'loading' ? (
+                                <><Loader2 className="w-4 h-4 animate-spin" /> Transmitting...</>
+                            ) : saveStatus === 'success' ? (
+                                <><CheckCircle className="w-4 h-4" /> Changes Saved</>
+                            ) : saveStatus === 'error' ? (
+                                <><AlertCircle className="w-4 h-4" /> Transmission Failed</>
+                            ) : (
+                                <><Send className="w-4 h-4" /> Save to GitHub</>
+                            )}
+                        </button>
+                        <button
+                            onClick={() => setIsAdmin(false)}
+                            className="text-sm text-secondary hover:text-contrast flex items-center gap-2"
+                        >
+                            <LogOut className="w-4 h-4" /> Sign out
+                        </button>
+                    </div>
                 </div>
 
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg text-sm text-primary flex gap-2 items-start">
-                    <div className="font-bold">Info:</div>
-                    <div>
-                        To edit website text (Hero titles, mission statements), simply <strong>Right-Click</strong> on the text directly on the website while logged in.
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg text-sm text-primary flex flex-col gap-3">
+                    <div className="flex gap-2 items-start">
+                        <div className="font-bold shrink-0">Centralized Data:</div>
+                        <div>
+                            All site data (projects, events, and content) is now managed through the <strong>Archive Repository</strong>. The local <code>metadata.json</code> is only used as a fallback.
+                        </div>
+                    </div>
+                    <div className="flex gap-2 items-start">
+                        <div className="font-bold shrink-0">Info:</div>
+                        <div>
+                            To edit website text (Hero titles, mission statements), simply <strong>Right-Click</strong> on the text directly on the website while logged in.
+                        </div>
+                    </div>
+                    {saveStatus === 'error' && (
+                        <div className="flex gap-2 items-start p-2 bg-red-50 border border-red-100 rounded text-red-800 text-xs animate-shake">
+                            <AlertCircle className="w-4 h-4 shrink-0" />
+                            <div>
+                                <strong>Save Error:</strong> {saveError}
+                            </div>
+                        </div>
+                    )}
+                    <div className="flex gap-2 items-start p-2 bg-amber-50 border border-amber-100 rounded text-amber-800 text-xs">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <div>
+                            <strong>Critical Workflow:</strong> Changes made here are saved to your <strong>local session only</strong>. You must click the <strong>"Save to GitHub"</strong> button above to persist these changes permanently to the website.
+                        </div>
                     </div>
                 </div>
 
@@ -272,17 +380,22 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                         </div>
                                     </div>
                                     <div className="flex-grow space-y-4">
-                                        <textarea
-                                            className="w-full bg-transparent text-xl font-medium text-contrast placeholder-gray-300 focus:outline-none resize-none"
-                                            rows={1}
-                                            value={project.title}
-                                            onChange={(e) => {
-                                                const newProjects = [...data.projects];
-                                                newProjects[index].title = e.target.value;
-                                                updateData({ projects: newProjects });
-                                            }}
-                                            placeholder="Project Title"
-                                        />
+                                        <div className="flex justify-between items-start gap-4">
+                                            <textarea
+                                                className="w-full bg-transparent text-xl font-medium text-contrast placeholder-gray-300 focus:outline-none resize-none"
+                                                rows={1}
+                                                value={project.title}
+                                                onChange={(e) => {
+                                                    const newProjects = [...data.projects];
+                                                    newProjects[index].title = e.target.value;
+                                                    updateData({ projects: newProjects });
+                                                }}
+                                                placeholder="Project Title"
+                                            />
+                                            <div className="text-[10px] font-mono text-gray-400 bg-gray-50 px-2 py-1 rounded border border-gray-100 whitespace-nowrap">
+                                                ID: {slugify(project.title)}
+                                            </div>
+                                        </div>
                                         <div className="flex items-center gap-2 text-sm text-gray-400 bg-gray-50 p-2 rounded-lg">
                                             <ImageIcon className="w-4 h-4 shrink-0" />
                                             <input
@@ -306,6 +419,14 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                             }}
                                             placeholder="Description"
                                         />
+                                        <div className="bg-blue-50/50 p-2 rounded-lg border border-blue-100/50">
+                                            <p className="text-[10px] text-blue-700 font-medium flex items-center gap-1">
+                                                <Github className="w-3 h-3" /> PROJECT ARCHIVE PATH:
+                                            </p>
+                                            <code className="text-[10px] text-blue-800 break-all">
+                                                /{PROJECTS_BASE_PATH}/{slugify(project.title)}/
+                                            </code>
+                                        </div>
                                         <div className="flex justify-between items-center pt-2 border-t border-gray-100">
                                             <select
                                                 className="bg-transparent text-xs text-secondary focus:outline-none cursor-pointer"
@@ -340,7 +461,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                                 </span>
                                             </div>
                                             <button
-                                                onClick={() => initializeArchiveFolders(project.id)}
+                                                onClick={() => initializeArchiveFolders(project)}
                                                 disabled={initStatus[project.id] === 'loading'}
                                                 className="text-[10px] font-bold uppercase tracking-wider bg-surface hover:bg-gray-100 text-contrast px-3 py-1.5 rounded-md border border-gray-200 transition-colors flex items-center gap-1.5"
                                             >
@@ -460,8 +581,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                 <div className="bg-surface rounded-xl p-6 border border-gray-100 space-y-4">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <p className="text-sm font-medium text-contrast">Content Repository</p>
-                                            <p className="text-xs text-secondary mt-1">Currently linked to: <code className="bg-gray-100 px-1 rounded">{CONTENT_REPO}</code></p>
+                                            <p className="text-sm font-medium text-contrast">Archive Repository (Single Source of Truth)</p>
+                                            <p className="text-xs text-secondary mt-1">Currently linked to: <code className="bg-gray-100 px-1 rounded">{ARCHIVE_REPO}</code></p>
                                         </div>
                                         <div className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase">Active</div>
                                     </div>
@@ -471,14 +592,14 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                             <RefreshCw className="w-3 h-3" /> Sync Instructions:
                                         </p>
                                         <ol className="list-decimal list-inside space-y-2">
-                                            <li>Push markdown logs to <code className="text-primary">/projects/[project-id].md</code></li>
-                                            <li>Upload images/videos to <code className="text-primary">/media/[project-id]/</code></li>
-                                            <li>Changes appear instantly on the website via GitHub API.</li>
+                                            <li>Create a folder for each update: <code className="text-primary">/projects/[project-slug]/YYYY-MM-DD-Title/</code></li>
+                                            <li>Inside each update folder, add a <code className="text-primary">desc.txt</code> for the log text.</li>
+                                            <li>Add images/videos to the same update folder for the gallery.</li>
                                         </ol>
                                     </div>
 
                                     <p className="text-[10px] text-gray-400 italic">
-                                        Note: To change the repository, update the <code>CONTENT_REPO</code> constant in <code>constants.ts</code>.
+                                        Note: To change the repository, update the <code>ARCHIVE_REPO</code> constant in <code>constants.ts</code>.
                                     </p>
                                 </div>
                             </div>
