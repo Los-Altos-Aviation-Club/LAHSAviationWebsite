@@ -71,7 +71,13 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
             const currentSha = fileData.sha;
 
             // 2. Prepare the new content
-            const content = btoa(JSON.stringify(data, null, 2));
+            let content: string;
+            try {
+                content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+            } catch (encodingErr) {
+                console.error('Encoding error:', encodingErr);
+                throw new Error('Failed to encode data for GitHub. This might be due to unsupported special characters.');
+            }
 
             // 3. Update the file in ARCHIVE
             const updateRes = await fetch(`${ARCHIVE_GITHUB_API_BASE_URL}/metadata.json`, {
@@ -130,7 +136,13 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
 
                 if (checkRes.status === 404) {
                     // Create placeholder file to "create" the folder in ARCHIVE
-                    const content = btoa(file.content);
+                    let content: string;
+                    try {
+                        content = btoa(unescape(encodeURIComponent(file.content)));
+                    } catch (encodingErr) {
+                        console.error('Encoding error:', encodingErr);
+                        throw new Error(`Failed to encode content for ${file.path}. This might be due to unsupported special characters.`);
+                    }
 
                     const createRes = await fetch(`${ARCHIVE_GITHUB_API_BASE_URL}/${file.path}`, {
                         method: 'PUT',
