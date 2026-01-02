@@ -9,9 +9,10 @@ interface AdminPortalProps {
     updateData: (newData: Partial<ClubData>) => void;
     isAdmin: boolean;
     setIsAdmin: (value: boolean) => void;
+    isArchiveLoaded?: boolean;
 }
 
-const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, setIsAdmin }) => {
+const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, setIsAdmin, isArchiveLoaded }) => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -322,8 +323,27 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
     return (
         <div className="min-h-screen bg-surface pt-28 px-6 pb-12">
             <div className="max-w-5xl mx-auto">
-                <div className="flex justify-between items-center mb-12">
-                    <h1 className="text-3xl font-semibold text-contrast">Website Control</h1>
+                <div className="flex justify-between items-end mb-12">
+                    <div className="space-y-2">
+                        <h1 className="text-3xl font-semibold text-contrast">Website Control</h1>
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white border border-gray-100 rounded-full shadow-sm">
+                                <div className={`w-1.5 h-1.5 rounded-full ${isArchiveLoaded ? 'bg-green-500 animate-pulse' : 'bg-amber-500'}`} />
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">
+                                    {isArchiveLoaded ? 'Archive Connected' : 'Local Mode'}
+                                </span>
+                            </div>
+                            <a
+                                href={`https://github.com/${ARCHIVE_REPO}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1.5 px-2.5 py-1 bg-white border border-gray-100 rounded-full shadow-sm text-secondary hover:text-primary transition-colors group"
+                            >
+                                <Github className="w-3 h-3 transition-transform group-hover:scale-110" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Repository</span>
+                            </a>
+                        </div>
+                    </div>
                     <div className="flex items-center gap-4">
                         <button
                             onClick={handleSaveToGitHub}

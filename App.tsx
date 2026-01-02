@@ -133,6 +133,7 @@ const MainContent: React.FC = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [isGameMode, setIsGameMode] = useState(false);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
+    const [isArchiveLoaded, setIsArchiveLoaded] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -157,6 +158,7 @@ const MainContent: React.FC = () => {
                         tickerItems: remoteData.tickerItems || prev.tickerItems
                     }));
 
+                    setIsArchiveLoaded(true);
                     console.log('Loaded data from Archive Repository');
                 } else {
                     console.warn('Failed to fetch metadata from Archive, using initial data');
@@ -303,6 +305,7 @@ const MainContent: React.FC = () => {
                                     updateData={updateData}
                                     isAdmin={isAdmin}
                                     setIsAdmin={setIsAdmin}
+                                    isArchiveLoaded={isArchiveLoaded}
                                 />
                             }
                         />
