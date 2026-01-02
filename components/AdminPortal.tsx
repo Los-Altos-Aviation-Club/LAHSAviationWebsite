@@ -37,6 +37,14 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
         localStorage.setItem('gh_pat', token);
     };
 
+    async function hashPassword(password: string) {
+        const msgUint8 = new TextEncoder().encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
+    }
+
     const handleSaveToGitHub = async () => {
         if (!githubToken) {
             alert('Please add a GitHub Personal Access Token in the Settings tab first.');
@@ -147,25 +155,29 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
         }
     };
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!password) return;
 
         setIsLoading(true);
         setError('');
 
-        const adminPasskey = import.meta.env.VITE_ADMIN_PASSKEY;
+        const adminHash = import.meta.env.VITE_ADMIN_HASH;
 
-        if (!adminPasskey) {
-            console.error('VITE_ADMIN_PASSKEY is not defined in the environment.');
-            setError('System configuration error: Passkey missing.');
+        if (!adminHash) {
+            console.error('VITE_ADMIN_HASH is not defined in the environment.');
+            setError('System configuration error: Hash missing.');
             setIsLoading(false);
             return;
         }
 
-        // Simulate network verification delay
-        setTimeout(() => {
-            if (password === adminPasskey) {
+        try {
+            const hashedInput = await hashPassword(password);
+
+            // Simulate network verification delay for UX
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            if (hashedInput === adminHash) {
                 setIsSuccess(true);
                 setTimeout(() => {
                     setIsAdmin(true);
@@ -178,7 +190,11 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                 setError('Incorrect password');
                 setIsLoading(false);
             }
-        }, 1000);
+        } catch (err) {
+            console.error('Hashing error:', err);
+            setError('An error occurred during verification.');
+            setIsLoading(false);
+        }
     };
 
     const handleDeleteProject = (id: string) => {

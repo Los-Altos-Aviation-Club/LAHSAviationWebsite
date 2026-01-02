@@ -50,13 +50,23 @@ git push -u origin main
 
 ## 3. Add GitHub Secrets
 
-For the deployment workflow and Admin Portal to work, you must add the admin passkey as a secret.
+For the deployment workflow and Admin Portal to work, you must add the hashed admin passkey as a secret.
 
 1.  In your GitHub repository, go to **Settings**.
 2.  In the left sidebar, click **Secrets and variables** > **Actions**.
 3.  Click **New repository secret**.
-4.  Name: `VITE_ADMIN_PASSKEY`
-5.  Value: Your chosen secret password for the Admin Portal.
+4.  Name: `VITE_ADMIN_HASH`
+5.  Value: The **SHA-256 hash** of your chosen password.
+    -   You can generate this hash using an online tool or by running this in your browser's console:
+        ```javascript
+        async function getHash(pw) {
+          const msgUint8 = new TextEncoder().encode(pw);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        await getHash('your-password-here');
+        ```
 6.  Click **Add secret**.
 
 ---

@@ -34,7 +34,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_ADMIN_PASSKEY: ${{ secrets.VITE_ADMIN_PASSKEY }}
+          VITE_ADMIN_HASH: ${{ secrets.VITE_ADMIN_HASH }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
