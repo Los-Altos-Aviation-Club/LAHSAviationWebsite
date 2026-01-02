@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LAHS Aviation Club</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              background: '#FFFFFF',
+              surface: '#F5F5F7',
+              primary: '#0071E3',
+              'primary-dark': '#005BB5',
+              contrast: '#1D1D1F',
+              secondary: '#86868B',
+              'sky-light': '#E3F2FD',
+              glass: 'rgba(255, 255, 255, 0.7)',
+              navy: '#001f3f',
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            boxShadow: {
+              'soft': '0 4px 20px rgba(0, 0, 0, 0.04)',
+              'hover': '0 10px 40px rgba(0, 113, 227, 0.15)',
+              'card': '0 0 0 1px rgba(0,0,0,0.03), 0 2px 8px rgba(0,0,0,0.04)',
+            },
+            animation: {
+              'float': 'float 6s ease-in-out infinite',
+              'float-delayed': 'float 6s ease-in-out 3s infinite',
+              'ticker': 'ticker 30s linear infinite',
+              'takeoff': 'takeoff 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+              'land': 'land 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+              'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-20px)' },
+              },
+              ticker: {
+                '0%': { transform: 'translateX(0)' },
+                '100%': { transform: 'translateX(-100%)' },
+              },
+              takeoff: {
+                '0%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+                '100%': { opacity: '0', transform: 'translateY(-50px) scale(0.95)', pointerEvents: 'none' },
+              },
+              land: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        color: #1D1D1F;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      
+      html { scroll-behavior: smooth; }
+
+      /* Blueprint Grid Pattern */
+      .bg-grid {
+        background-size: 40px 40px;
+        background-image: linear-gradient(to right, rgba(0, 113, 227, 0.05) 1px, transparent 1px),
+                          linear-gradient(to bottom, rgba(0, 113, 227, 0.05) 1px, transparent 1px);
+      }
+      
+      .bg-grid-dark {
+        background-size: 40px 40px;
+        background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                          linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      }
+
+      /* Boarding Pass Tear Line */
+      .tear-line {
+        background-image: linear-gradient(to right, #ccc 50%, rgba(255,255,255,0) 0%);
+        background-position: bottom;
+        background-size: 10px 1px;
+        background-repeat: repeat-x;
+      }
+
+      .fade-in { animation: fadeIn 1s ease-in forwards; }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      .perspective-1000 { perspective: 1000px; }
+      .rotate-y-12 { transform: rotateY(12deg); }
+      
+      /* Hardware acceleration utility */
+      .will-change-transform { will-change: transform; }
+    </style>
+
+<link rel="stylesheet" href="/index.css">
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.11.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+  }
+}
+</script>
+  <script type="module" crossorigin src="./assets/index-ubboyV4Q.js"></script>
+</head>
+  <body>
+    <div id="root"></div>
+</body>
+</html>
