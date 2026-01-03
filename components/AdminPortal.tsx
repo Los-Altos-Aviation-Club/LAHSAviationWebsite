@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ClubData, Project, Meeting, Officer } from '../types';
-import { LogOut, Plus, Trash2, ChevronLeft, Loader2, CheckCircle, AlertCircle, Image as ImageIcon, RefreshCw, Github, FolderPlus, Send, Calendar, CloudSync, Users, ArrowUp, ArrowDown } from 'lucide-react';
+import { ClubData, Project, Meeting, Officer, FeatureBox } from '../types';
+import { LogOut, Plus, Trash2, ChevronLeft, Loader2, CheckCircle, AlertCircle, Image as ImageIcon, RefreshCw, Github, FolderPlus, Send, Calendar, CloudSync, Users, ArrowUp, ArrowDown, Layout } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ARCHIVE_REPO, ARCHIVE_GITHUB_API_BASE_URL, PROJECTS_BASE_PATH } from '../constants';
 
@@ -17,7 +17,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-    const [activeTab, setActiveTab] = useState<'projects' | 'meetings' | 'team' | 'settings'>('projects');
+    const [activeTab, setActiveTab] = useState<'projects' | 'meetings' | 'team' | 'sections' | 'settings'>('projects');
     const [githubToken, setGithubToken] = useState<string>(() => localStorage.getItem('gh_pat') || '');
     const [initStatus, setInitStatus] = useState<Record<string, 'loading' | 'success' | 'error' | 'none'>>({});
     const [isBulkSyncing, setIsBulkSyncing] = useState(false);
@@ -333,6 +333,30 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
         updateData({ officers: newOfficers });
     };
 
+    const handleAddFeatureBox = () => {
+        const newBox: FeatureBox = {
+            id: Date.now().toString(),
+            icon: 'Plane',
+            title: 'New Feature',
+            description: 'Feature description goes here.'
+        };
+        updateData({ featureBoxes: [...(data.featureBoxes || []), newBox] });
+    };
+
+    const handleDeleteFeatureBox = (id: string) => {
+        updateData({ featureBoxes: (data.featureBoxes || []).filter(b => b.id !== id) });
+    };
+
+    const handleMoveFeatureBox = (index: number, direction: 'up' | 'down') => {
+        const newBoxes = [...(data.featureBoxes || [])];
+        const targetIndex = direction === 'up' ? index - 1 : index + 1;
+
+        if (targetIndex < 0 || targetIndex >= newBoxes.length) return;
+
+        [newBoxes[index], newBoxes[targetIndex]] = [newBoxes[targetIndex], newBoxes[index]];
+        updateData({ featureBoxes: newBoxes });
+    };
+
     const handleCreateRecurring = () => {
         const newMeetings: Meeting[] = [];
         let currentDate = new Date(recurringStartDate);
@@ -561,7 +585,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
 
                 {/* Tabs */}
                 <div className="flex border-b border-gray-200 mb-8 space-x-8 overflow-x-auto">
-                    {(['projects', 'meetings', 'team', 'settings'] as const).map(tab => (
+                    {(['projects', 'meetings', 'team', 'sections', 'settings'] as const).map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
@@ -1147,6 +1171,101 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                     <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                                     <h3 className="text-lg font-medium text-contrast">No officers listed</h3>
                                     <p className="text-secondary mt-2">Click "Add Officer" to begin building the team directory.</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Sections (Feature Boxes) */}
+                    {activeTab === 'sections' && (
+                        <div className="space-y-6">
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-sm font-bold text-secondary uppercase tracking-widest">Home / Mission Feature Boxes</h3>
+                                <button onClick={handleAddFeatureBox} className="bg-white hover:bg-gray-50 text-contrast border border-gray-200 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm">
+                                    <Plus className="w-4 h-4" /> Add Box
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                {(data.featureBoxes || []).map((box, index) => (
+                                    <div key={box.id} className="bg-white border border-gray-200 p-6 rounded-2xl flex items-center gap-6 shadow-sm group">
+                                        <div className="flex flex-col gap-2">
+                                            <button
+                                                onClick={() => handleMoveFeatureBox(index, 'up')}
+                                                disabled={index === 0}
+                                                className="p-1 text-gray-400 hover:text-primary disabled:opacity-30 disabled:hover:text-gray-400 transition-colors"
+                                                title="Move Up"
+                                            >
+                                                <ArrowUp className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleMoveFeatureBox(index, 'down')}
+                                                disabled={index === (data.featureBoxes?.length || 0) - 1}
+                                                className="p-1 text-gray-400 hover:text-primary disabled:opacity-30 disabled:hover:text-gray-400 transition-colors"
+                                                title="Move Down"
+                                            >
+                                                <ArrowDown className="w-4 h-4" />
+                                            </button>
+                                        </div>
+
+                                        <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-primary shrink-0 border border-blue-100">
+                                            <Layout className="w-5 h-5" />
+                                        </div>
+
+                                        <div className="flex-grow grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Icon Name (Lucide)</label>
+                                                <input
+                                                    className="bg-transparent text-sm font-mono text-contrast focus:outline-none border-b border-transparent focus:border-gray-100 pb-1"
+                                                    value={box.icon}
+                                                    onChange={(e) => {
+                                                        const newBoxes = [...(data.featureBoxes || [])];
+                                                        newBoxes[index].icon = e.target.value;
+                                                        updateData({ featureBoxes: newBoxes });
+                                                    }}
+                                                    placeholder="e.g. Plane, Wrench..."
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Title</label>
+                                                <input
+                                                    className="bg-transparent text-sm font-bold text-contrast focus:outline-none border-b border-transparent focus:border-gray-100 pb-1"
+                                                    value={box.title}
+                                                    onChange={(e) => {
+                                                        const newBoxes = [...(data.featureBoxes || [])];
+                                                        newBoxes[index].title = e.target.value;
+                                                        updateData({ featureBoxes: newBoxes });
+                                                    }}
+                                                    placeholder="Box Title"
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Description</label>
+                                                <textarea
+                                                    className="bg-transparent text-sm text-secondary focus:outline-none border-b border-transparent focus:border-gray-100 pb-1 resize-none"
+                                                    rows={1}
+                                                    value={box.description}
+                                                    onChange={(e) => {
+                                                        const newBoxes = [...(data.featureBoxes || [])];
+                                                        newBoxes[index].description = e.target.value;
+                                                        updateData({ featureBoxes: newBoxes });
+                                                    }}
+                                                    placeholder="Description..."
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <button onClick={() => handleDeleteFeatureBox(box.id)} className="text-red-400 hover:text-red-600 transition-colors p-2">
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {(!data.featureBoxes || data.featureBoxes.length === 0) && (
+                                <div className="text-center py-20 bg-white border border-dashed border-gray-200 rounded-3xl">
+                                    <Layout className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                                    <h3 className="text-lg font-medium text-contrast">No feature boxes</h3>
+                                    <p className="text-secondary mt-2">Click "Add Box" to create dynamic feature sections.</p>
                                 </div>
                             )}
                         </div>

@@ -19,6 +19,16 @@ const EditableImage: React.FC<EditableImageProps> = ({
     const [isEditing, setIsEditing] = useState(false);
     const [tempUrl, setTempUrl] = useState(src || '');
 
+    const transformGoogleDriveUrl = (url: string) => {
+        if (!url) return url;
+        const driveRegex = /drive\.google\.com\/file\/d\/([^\/]+)/;
+        const match = url.match(driveRegex);
+        if (match && match[1]) {
+            return `https://lh3.googleusercontent.com/d/${match[1]}`;
+        }
+        return url;
+    };
+
     const handleDoubleClick = (e: React.MouseEvent) => {
         if (isAdmin) {
             e.preventDefault();
@@ -28,7 +38,7 @@ const EditableImage: React.FC<EditableImageProps> = ({
     };
 
     const handleSave = () => {
-        onSave(tempUrl);
+        onSave(transformGoogleDriveUrl(tempUrl));
         setIsEditing(false);
     };
 
@@ -38,7 +48,7 @@ const EditableImage: React.FC<EditableImageProps> = ({
     };
 
     // If no src is provided but we are admin, render a placeholder
-    const displaySrc = src || (isAdmin ? 'https://via.placeholder.com/400x300?text=Double+Click+To+Add+Image' : null);
+    const displaySrc = transformGoogleDriveUrl(src) || (isAdmin ? 'https://via.placeholder.com/400x300?text=Double+Click+To+Add+Image' : null);
 
     if (!displaySrc) return null;
 
@@ -46,7 +56,7 @@ const EditableImage: React.FC<EditableImageProps> = ({
         <>
             <div
                 onDoubleClick={handleDoubleClick}
-                className={`relative ${className} ${isAdmin ? 'cursor-edit group' : ''}`}
+                className={`relative ${className} ${isAdmin ? 'cursor-edit group transition-all' : ''}`}
                 title={isAdmin ? "Double-click to edit image" : undefined}
             >
                 <img src={displaySrc} alt={alt} className="w-full h-full object-cover" />
@@ -58,16 +68,22 @@ const EditableImage: React.FC<EditableImageProps> = ({
             </div>
 
             {isEditing && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" onClick={(e) => e.stopPropagation()}>
-                    <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg mx-4 border border-gray-200" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex justify-between items-center mb-4">
-                            <div className="flex items-center gap-2 text-primary font-mono text-sm uppercase tracking-widest">
-                                <ImageIcon className="w-4 h-4" /> Edit Image Source
-                            </div>
-                            <button onClick={handleCancel} className="text-gray-400 hover:text-contrast transition-colors">
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
+                <div
+                    className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 backdrop-blur-md animate-fade-in"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }}
+                    onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }}
+                >
+                    <div
+                        className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg mx-4 border border-gray-200"
+                        onClick={(e) => e.stopPropagation()}
+                        onMouseDown={(e) => e.stopPropagation()}
+                    >
 
                         <div className="mb-6 space-y-4">
                             <div>

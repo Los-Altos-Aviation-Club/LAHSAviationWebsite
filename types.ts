@@ -54,6 +54,7 @@ export interface SiteContent {
     navbarTitle: string;
     navbarSubtitle: string;
     marqueeText: string;
+    meetingsMarquee: string;
 }
 
 export interface Pillar {
@@ -70,6 +71,13 @@ export interface TickerItem {
     type: 'wind' | 'zap' | 'users';
 }
 
+export interface FeatureBox {
+    id: string;
+    icon: string;
+    title: string;
+    description: string;
+}
+
 export interface ClubData {
     projects: Project[];
     officers: Officer[];
@@ -77,6 +85,7 @@ export interface ClubData {
     siteContent: SiteContent;
     pillars: Pillar[];
     tickerItems: TickerItem[];
+    featureBoxes: FeatureBox[];
     googleCalendarUrl: string;
     discordUrl: string;
 }

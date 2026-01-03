@@ -8,7 +8,7 @@ import Events from './components/Meetings';
 import Contact from './components/Contact';
 import AdminPortal from './components/AdminPortal';
 import Footer from './components/Footer';
-import { ClubData, SiteContent, Project, Meeting, Pillar, Officer, TickerItem } from './types';
+import { ClubData, SiteContent, Project, Meeting, Pillar, Officer, TickerItem, FeatureBox } from './types';
 import { Plane } from 'lucide-react';
 import { ARCHIVE_RAW_BASE_URL } from './constants';
 
@@ -67,6 +67,26 @@ const INITIAL_DATA: ClubData = {
         { id: '2', label: 'Next Launch', value: 'OCT 25', type: 'zap' },
         { id: '3', label: 'Members', value: '45+ Active', type: 'users' }
     ],
+    featureBoxes: [
+        {
+            id: '1',
+            icon: 'Plane',
+            title: 'Design',
+            description: 'Learn the principles of aeronautics and use CAD software to design your own airframes.'
+        },
+        {
+            id: '2',
+            icon: 'Wrench',
+            title: 'Build',
+            description: 'Get hands-on experience with composite materials, electronics, and mechanical assembly.'
+        },
+        {
+            id: '3',
+            icon: 'Navigation',
+            title: 'Fly',
+            description: 'Take your creations to the skies and analyze flight data to improve performance.'
+        }
+    ],
     siteContent: {
         homeHeroTitle: 'We Build Things That Fly',
         homeHeroSubtitle: 'Los Altos High School Aviation Club. Designing drones, rockets, and the next generation of aerospace engineers.',
@@ -83,7 +103,8 @@ const INITIAL_DATA: ClubData = {
         contactSubtitle: 'We are looking for students passionate about engineering, design, and flight. No prior experience is required—just curiosity.',
         navbarTitle: 'LAHS',
         navbarSubtitle: 'Aviation Club',
-        marqueeText: 'Welcome to the Los Altos High School Aviation Club • Join us every Tuesday in Room 702 • Engineering the future of flight • Blue Skies Ahead'
+        marqueeText: 'Welcome to the Los Altos High School Aviation Club • Join us every Tuesday in Room 702 • Engineering the future of flight • Blue Skies Ahead',
+        meetingsMarquee: '/// Logbook'
     },
     googleCalendarUrl: 'https://calendar.google.com',
     discordUrl: 'https://discord.gg/example'
@@ -185,7 +206,8 @@ const MainContent: React.FC = () => {
                             officers: finalData.officers || prev.officers,
                             meetings: filteredMeetings.length > 0 ? filteredMeetings : (finalData.meetings || prev.meetings),
                             pillars: finalData.pillars || prev.pillars,
-                            tickerItems: finalData.tickerItems || prev.tickerItems
+                            tickerItems: finalData.tickerItems || prev.tickerItems,
+                            featureBoxes: finalData.featureBoxes || prev.featureBoxes
                         };
                     });
 
@@ -270,6 +292,16 @@ const MainContent: React.FC = () => {
         }));
     };
 
+    const updateFeatureBox = (id: string, field: keyof FeatureBox, value: string) => {
+        setData(prev => ({
+            ...prev,
+            featureBoxes: (prev.featureBoxes || []).map(b => {
+                if (b.id !== id) return b;
+                return { ...b, [field]: value };
+            })
+        }));
+    };
+
     return (
         <>
             <ScrollToTop />
@@ -285,6 +317,7 @@ const MainContent: React.FC = () => {
                                     isAdmin={isAdmin}
                                     onUpdate={updateSiteContent}
                                     onUpdateTicker={updateTicker}
+                                    onUpdateFeatureBox={updateFeatureBox}
                                     setGameMode={setIsGameMode}
                                 />
                             }

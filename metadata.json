@@ -1,5 +1,86 @@
 {
-    "name": "LAHS Aviation Club",
-    "description": "Official website for the Los Altos High School Aviation Club, featuring a digital Project Archive, project blueprints, and flight schedules.",
-    "requestFramePermissions": []
+    "projects": [],
+    "officers": [],
+    "meetings": [],
+    "siteContent": {
+        "homeHeroTitle": "We Build Things That Fly",
+        "homeHeroSubtitle": "Los Altos High School Aviation Club. Designing drones, rockets, and the next generation of aerospace engineers.",
+        "missionTitle": "Our Mission",
+        "missionStatement": "Bridging the gap between theoretical physics and real-world aerospace engineering through hands-on fabrication and flight testing.",
+        "missionTeamTitle": "Meet the Team",
+        "missionTeamSubtitle": "The pilots, engineers, and dreamers behind the projects.",
+        "meetingsTitle": "Upcoming Departures",
+        "meetingsSubtitle": "Workshops, launches, and guest speakers.",
+        "projectsTitle": "Active Development",
+        "projectsSubtitle": "Current engineering efforts in rocketry, fixed-wing aircraft, and multi-rotor systems.",
+        "projectsMarquee": "/// Project Access",
+        "contactTitle": "Clear for Takeoff?",
+        "contactSubtitle": "We are looking for students passionate about engineering, design, and flight. No prior experience is required—just curiosity.",
+        "navbarTitle": "LAHS",
+        "navbarSubtitle": "Aviation Club",
+        "marqueeText": "Welcome to the Los Altos High School Aviation Club • Join us every Tuesday in Room 702 • Engineering the future of flight • Blue Skies Ahead",
+        "meetingsMarquee": "/// Logbook"
+    },
+    "pillars": [
+        {
+            "id": "1",
+            "imageUrl": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop",
+            "title": "Avionics",
+            "description": "Development of custom flight computers, telemetry systems, and autonomous control logic for UAVs."
+        },
+        {
+            "id": "2",
+            "imageUrl": "https://images.unsplash.com/photo-1559067515-bf7d799b6d42?q=80&w=2070&auto=format&fit=crop",
+            "title": "Aerodynamics",
+            "description": "Utilizing CFD analysis and wind tunnel testing to optimize airframe efficiency and stability."
+        },
+        {
+            "id": "3",
+            "imageUrl": "https://images.unsplash.com/photo-1581092921461-eab62e97a782?q=80&w=2070&auto=format&fit=crop",
+            "title": "Crew Training",
+            "description": "Mentorship programs pairing senior engineers with new members to teach CAD, soldering, and piloting."
+        }
+    ],
+    "tickerItems": [
+        {
+            "id": "1",
+            "label": "Current Project",
+            "value": "L1 Rocketry",
+            "type": "wind"
+        },
+        {
+            "id": "2",
+            "label": "Next Launch",
+            "value": "OCT 25",
+            "type": "zap"
+        },
+        {
+            "id": "3",
+            "label": "Members",
+            "value": "45+ Active",
+            "type": "users"
+        }
+    ],
+    "featureBoxes": [
+        {
+            "id": "1",
+            "icon": "Plane",
+            "title": "Design",
+            "description": "Learn the principles of aeronautics and use CAD software to design your own airframes."
+        },
+        {
+            "id": "2",
+            "icon": "Wrench",
+            "title": "Build",
+            "description": "Get hands-on experience with composite materials, electronics, and mechanical assembly."
+        },
+        {
+            "id": "3",
+            "icon": "Navigation",
+            "title": "Fly",
+            "description": "Take your creations to the skies and analyze flight data to improve performance."
+        }
+    ],
+    "googleCalendarUrl": "https://calendar.google.com",
+    "discordUrl": "https://discord.gg/example"
 }

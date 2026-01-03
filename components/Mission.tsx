@@ -23,9 +23,6 @@ const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdatePill
             {/* Header */}
             <div className="relative z-10 bg-white border-b border-gray-100 py-16 px-6">
                 <div className="max-w-7xl mx-auto text-center">
-                    <div className="inline-block py-1 px-3 mb-4 rounded bg-blue-50 text-primary text-xs font-mono font-bold uppercase tracking-widest">
-                        Classified: Public
-                    </div>
                     <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 text-transparent bg-clip-text bg-gradient-to-br from-primary via-blue-500 to-sky-400">
                         <EditableText
                             value={data.siteContent.missionTitle || 'Our Mission'}
@@ -93,6 +90,24 @@ const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdatePill
                 </div>
             </section>
 
+            {/* Mission Section (Image & Banner) */}
+            <section className="py-20 px-6 lg:px-8 bg-surface border-t border-gray-100">
+                <div className="max-w-7xl mx-auto">
+                    <div className="w-full rounded-3xl overflow-hidden shadow-2xl relative group bg-gray-200 h-[400px]">
+                        <EditableImage
+                            src={data.siteContent.missionBannerUrl || "https://images.unsplash.com/photo-1464746109676-23191284eb3b?q=80&w=2072&auto=format&fit=crop"}
+                            alt="Aviation Club Team"
+                            onSave={(val) => onUpdate('missionBannerUrl', val)}
+                            isAdmin={isAdmin}
+                            className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 flex flex-col items-center justify-end pb-12 pointer-events-none">
+                            <p className="text-white/80 font-mono text-sm uppercase tracking-widest mb-2">LAHS Aviation Club</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Meet the Team Section */}
             <section className="py-20 px-6 lg:px-8 bg-white border-t border-gray-100">
                 <div className="max-w-7xl mx-auto">
@@ -149,19 +164,6 @@ const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdatePill
                                 </p>
                             </div>
                         ))}
-                    </div>
-
-                    <div className="mt-20 w-full rounded-3xl overflow-hidden shadow-2xl relative group bg-gray-200 h-[400px]">
-                        {/* Club Identity Banner */}
-                        <img
-                            src="https://images.unsplash.com/photo-1464746109676-23191284eb3b?q=80&w=2072&auto=format&fit=crop"
-                            alt="Aviation Club Team"
-                            className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 flex flex-col items-center justify-end pb-12">
-                            <p className="text-white/80 font-mono text-sm uppercase tracking-widest mb-2">LAHS Aviation Club</p>
-                            <p className="text-white text-lg font-light italic">"Ad Astra Per Aspera"</p>
-                        </div>
                     </div>
                 </div>
             </section>

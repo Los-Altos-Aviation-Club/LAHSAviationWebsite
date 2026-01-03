@@ -91,7 +91,7 @@ const EditableText: React.FC<EditableTextProps> = ({
 
         const modalContent = (
             <div
-                className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in"
+                className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 backdrop-blur-md animate-fade-in"
                 onClick={handleBackdropClick}
                 onMouseDown={(e) => e.stopPropagation()}
             >

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ClubData, SiteContent, TickerItem } from '../types';
-import { ArrowRight, Wind, Zap, Users } from 'lucide-react';
+import { ClubData, SiteContent, TickerItem, FeatureBox } from '../types';
+import { ArrowRight, Wind, Zap, Users, Plane, Wrench, Navigation, Layout } from 'lucide-react';
 import EditableText from './EditableText';
 
 interface HomeProps {
@@ -9,10 +9,11 @@ interface HomeProps {
     isAdmin: boolean;
     onUpdate: (key: keyof SiteContent, value: string) => void;
     onUpdateTicker: (id: string, field: keyof TickerItem, value: string) => void;
+    onUpdateFeatureBox: (id: string, field: keyof FeatureBox, value: string) => void;
     setGameMode: (val: boolean) => void;
 }
 
-const Home: React.FC<HomeProps> = ({ data, isAdmin, onUpdate, onUpdateTicker, setGameMode }) => {
+const Home: React.FC<HomeProps> = ({ data, isAdmin, onUpdate, onUpdateTicker, onUpdateFeatureBox, setGameMode }) => {
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
@@ -32,6 +33,18 @@ const Home: React.FC<HomeProps> = ({ data, isAdmin, onUpdate, onUpdateTicker, se
             case 'zap': return <Zap className="w-3 h-3 text-yellow-400" />;
             case 'users': return <Users className="w-3 h-3 text-green-400" />;
             default: return <Wind className="w-3 h-3" />;
+        }
+    };
+
+    const getFeatureIcon = (iconName: string) => {
+        switch (iconName) {
+            case 'Plane': return <Plane className="w-8 h-8 text-primary" />;
+            case 'Wrench': return <Wrench className="w-8 h-8 text-primary" />;
+            case 'Navigation': return <Navigation className="w-8 h-8 text-primary" />;
+            case 'Zap': return <Zap className="w-8 h-8 text-primary" />;
+            case 'Users': return <Users className="w-8 h-8 text-primary" />;
+            case 'Wind': return <Wind className="w-8 h-8 text-primary" />;
+            default: return <Layout className="w-8 h-8 text-primary" />;
         }
     };
 
@@ -98,6 +111,38 @@ const Home: React.FC<HomeProps> = ({ data, isAdmin, onUpdate, onUpdateTicker, se
                         <Link to="/mission" className="px-8 py-3.5 bg-white text-contrast border border-gray-200 font-medium rounded-full hover:bg-gray-50 transition-colors flex items-center gap-2">
                             Our Mission
                         </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* FEATURE BOXES SECTION */}
+            <section className="py-24 bg-white relative z-20">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                        {(data.featureBoxes || []).map((box) => (
+                            <div key={box.id} className="flex flex-col items-center text-center group">
+                                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                                    {getFeatureIcon(box.icon)}
+                                </div>
+                                <h3 className="text-2xl font-bold mb-4">
+                                    <EditableText
+                                        value={box.title}
+                                        onSave={(val) => onUpdateFeatureBox(box.id, 'title', val)}
+                                        isAdmin={isAdmin}
+                                        label="Feature Title"
+                                    />
+                                </h3>
+                                <p className="text-secondary leading-relaxed">
+                                    <EditableText
+                                        value={box.description}
+                                        onSave={(val) => onUpdateFeatureBox(box.id, 'description', val)}
+                                        isAdmin={isAdmin}
+                                        label="Feature Description"
+                                        multiline
+                                    />
+                                </p>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>

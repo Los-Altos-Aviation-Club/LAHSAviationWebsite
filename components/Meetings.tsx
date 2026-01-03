@@ -20,7 +20,14 @@ const Meetings: React.FC<MeetingsProps> = ({ data, isAdmin, onUpdate, onUpdateMe
 
                 {/* Header */}
                 <div className="mb-16 text-center">
-                    <h2 className="text-sm font-mono text-primary mb-2 uppercase tracking-widest">/// Logbook</h2>
+                    <h2 className="text-sm font-mono text-primary mb-2 uppercase tracking-widest">
+                        <EditableText
+                            value={data.siteContent.meetingsMarquee || '/// Logbook'}
+                            onSave={(val) => onUpdate('meetingsMarquee', val)}
+                            isAdmin={isAdmin}
+                            label="Meetings Marquee"
+                        />
+                    </h2>
                     <h3 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-primary via-blue-500 to-sky-400 pb-2">
                         <EditableText
                             value={data.siteContent.meetingsTitle || 'Upcoming Departures'}
