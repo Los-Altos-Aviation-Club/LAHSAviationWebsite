@@ -47,6 +47,19 @@ const EditableText: React.FC<EditableTextProps> = ({
         setIsEditing(false);
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !multiline) {
+            handleSave();
+        } else if (e.key === 'Escape') {
+            handleCancel();
+        }
+    };
+
+    const handleBackdropClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        handleSave();
+    };
+
     // Determine input type
     const effectiveInputType = inputType || (multiline ? 'textarea' : 'text');
 
@@ -55,7 +68,7 @@ const EditableText: React.FC<EditableTextProps> = ({
         if (!isEditing) return null;
 
         return (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" onClick={handleBackdropClick}>
                 <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg mx-4 border border-gray-200" onClick={(e) => e.stopPropagation()}>
                     <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2 text-primary font-mono text-sm uppercase tracking-widest">
@@ -71,6 +84,7 @@ const EditableText: React.FC<EditableTextProps> = ({
                             <textarea
                                 value={tempValue}
                                 onChange={(e) => setTempValue(e.target.value)}
+                                onKeyDown={handleKeyDown}
                                 className="w-full h-40 p-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-primary text-contrast resize-none"
                                 autoFocus
                             />
@@ -79,12 +93,13 @@ const EditableText: React.FC<EditableTextProps> = ({
                                 type={effectiveInputType}
                                 value={tempValue}
                                 onChange={(e) => setTempValue(e.target.value)}
+                                onKeyDown={handleKeyDown}
                                 className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-primary text-contrast"
                                 autoFocus
                             />
                         )}
                         <p className="mt-2 text-xs text-secondary">
-                            {inputType === 'date' ? 'Format: YYYY-MM-DD' : 'Changes reflect immediately upon saving.'}
+                            {inputType === 'date' ? 'Format: YYYY-MM-DD' : 'Press Enter to save, Esc to cancel.'}
                         </p>
                     </div>
 
@@ -110,10 +125,17 @@ const EditableText: React.FC<EditableTextProps> = ({
     return (
         <>
             <span
+                onClick={(e) => {
+                    if (isAdmin) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsEditing(true);
+                    }
+                }}
                 onContextMenu={handleRightClick}
-                className={`${className} ${isAdmin ? 'cursor-context-menu hover:outline-dashed hover:outline-2 hover:outline-primary/50 hover:bg-primary/5 rounded px-1 -mx-1 transition-all relative inline-block min-w-[1em] min-h-[1em]' : ''}`}
+                className={`${className} pointer-events-auto ${isAdmin ? 'cursor-context-menu hover:outline-dashed hover:outline-2 hover:outline-primary/50 hover:bg-primary/5 rounded px-1 -mx-1 transition-all relative inline-block min-w-[1em] min-h-[1em]' : ''}`}
                 style={isAdmin ? { color: 'inherit', WebkitTextFillColor: 'currentcolor' } : {}}
-                title={isAdmin ? "Right-click to edit" : undefined}
+                title={isAdmin ? "Click or Right-click to edit" : undefined}
             >
                 {(children || value) || (isAdmin && (
                     <span className="opacity-50 italic text-sm text-inherit" style={{ WebkitTextFillColor: 'currentcolor' }}>Click to Edit</span>

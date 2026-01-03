@@ -430,10 +430,10 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
 
                             {/* Auto-Sync Status Pill */}
                             <div className={`flex items-center gap-1.5 px-2.5 py-1 border rounded-full shadow-sm transition-all duration-300 ${saveStatus === 'unsaved' ? 'bg-amber-50 border-amber-200 text-amber-700' :
-                                    saveStatus === 'loading' ? 'bg-blue-50 border-blue-200 text-blue-700' :
-                                        saveStatus === 'success' ? 'bg-green-50 border-green-200 text-green-700' :
-                                            saveStatus === 'error' ? 'bg-red-50 border-red-200 text-red-700' :
-                                                'bg-gray-50 border-gray-100 text-gray-400'
+                                saveStatus === 'loading' ? 'bg-blue-50 border-blue-200 text-blue-700' :
+                                    saveStatus === 'success' ? 'bg-green-50 border-green-200 text-green-700' :
+                                        saveStatus === 'error' ? 'bg-red-50 border-red-200 text-red-700' :
+                                            'bg-gray-50 border-gray-100 text-gray-400'
                                 }`}>
                                 {saveStatus === 'unsaved' && (
                                     <>
@@ -1052,6 +1052,33 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                     value={data.discordUrl}
                                     onChange={(e) => updateData({ discordUrl: e.target.value })}
                                 />
+                            </div>
+
+                            <div className="pt-8 border-t border-gray-100">
+                                <h3 className="text-sm font-bold text-contrast mb-4 flex items-center gap-2">
+                                    <CloudSync className="w-4 h-4 text-primary" /> Data Persistence & Sync Help
+                                </h3>
+                                <div className="bg-blue-50/50 rounded-xl p-6 border border-blue-100 space-y-4">
+                                    <p className="text-sm font-medium text-blue-900">How saving works:</p>
+                                    <ul className="text-xs text-blue-800 space-y-3">
+                                        <li className="flex gap-2">
+                                            <span className="font-bold">1. Local Buffer:</span>
+                                            Any change you make (editing text, adding projects) is immediately stored in your browser's local storage. This is your "draft" state.
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="font-bold">2. Auto-Sync:</span>
+                                            While in the Admin Portal, the system will attempt to automatically push your changes to the GitHub Archive repository every 10 seconds after your last edit.
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="font-bold">3. Manual Push:</span>
+                                            Use the <strong>"Save to GitHub"</strong> button at the top right to force an immediate update. This is the only way to ensure the public website sees your changes.
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="font-bold">4. Right-Click Editing:</span>
+                                            You don't need to be in this portal to edit text. When logged in, navigate to any page and <strong>Right-Click</strong> on headlines or descriptions to edit them in-place.
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
 
                             <div className="pt-8 border-t border-gray-100">

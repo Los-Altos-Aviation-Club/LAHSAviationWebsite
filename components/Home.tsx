@@ -104,7 +104,7 @@ const Home: React.FC<HomeProps> = ({ data, isAdmin, onUpdate, onUpdateTicker, se
 
             {/* INFINITE TICKER */}
             <div className="w-full bg-contrast py-3 overflow-hidden border-y border-white/10 relative z-20">
-                <div className="flex animate-ticker whitespace-nowrap">
+                <div className="flex animate-ticker whitespace-nowrap hover:[animation-play-state:paused]">
                     {[...Array(4)].map((_, repeatIdx) => (
                         <div key={repeatIdx} className="flex items-center">
                             <span className="text-white/80 font-mono text-sm uppercase tracking-widest flex items-center gap-8 mx-4">
