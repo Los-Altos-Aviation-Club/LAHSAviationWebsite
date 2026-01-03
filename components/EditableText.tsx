@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Pencil, Save, X } from 'lucide-react';
 
 interface EditableTextProps {
@@ -29,6 +30,17 @@ const EditableText: React.FC<EditableTextProps> = ({
         setTempValue(value);
     }, [value]);
 
+    useEffect(() => {
+        if (isEditing) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isEditing]);
+
     const handleRightClick = (e: React.MouseEvent) => {
         if (isAdmin) {
             e.preventDefault(); // Stop standard context menu
@@ -37,27 +49,37 @@ const EditableText: React.FC<EditableTextProps> = ({
         }
     };
 
-    const handleSave = () => {
+    const handleSave = (e?: React.MouseEvent | React.KeyboardEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         onSave(tempValue);
         setIsEditing(false);
     };
 
-    const handleCancel = () => {
+    const handleCancel = (e?: React.MouseEvent | React.KeyboardEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         setTempValue(value);
         setIsEditing(false);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !multiline) {
-            handleSave();
+            handleSave(e);
         } else if (e.key === 'Escape') {
-            handleCancel();
+            handleCancel(e);
         }
     };
 
     const handleBackdropClick = (e: React.MouseEvent) => {
+        e.preventDefault();
         e.stopPropagation();
-        handleSave();
+        // Don't auto-save on backdrop click to prevent accidental saves/closes
+        // The user should explicitly click Save or Cancel/X
     };
 
     // Determine input type
@@ -67,14 +89,26 @@ const EditableText: React.FC<EditableTextProps> = ({
     const renderModal = () => {
         if (!isEditing) return null;
 
-        return (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" onClick={handleBackdropClick}>
-                <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg mx-4 border border-gray-200" onClick={(e) => e.stopPropagation()}>
+        const modalContent = (
+            <div
+                className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in"
+                onClick={handleBackdropClick}
+                onMouseDown={(e) => e.stopPropagation()}
+            >
+                <div
+                    className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg mx-4 border border-gray-200"
+                    onClick={(e) => e.stopPropagation()}
+                    onMouseDown={(e) => e.stopPropagation()}
+                >
                     <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2 text-primary font-mono text-sm uppercase tracking-widest">
                             <Pencil className="w-4 h-4" /> {label}
                         </div>
-                        <button onClick={handleCancel} className="text-gray-400 hover:text-contrast transition-colors">
+                        <button
+                            onClick={handleCancel}
+                            className="text-gray-400 hover:text-contrast transition-colors p-1"
+                            type="button"
+                        >
                             <X className="w-5 h-5" />
                         </button>
                     </div>
@@ -107,12 +141,14 @@ const EditableText: React.FC<EditableTextProps> = ({
                         <button
                             onClick={handleCancel}
                             className="px-4 py-2 text-secondary font-medium hover:text-contrast transition-colors"
+                            type="button"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleSave}
                             className="px-6 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors flex items-center gap-2"
+                            type="button"
                         >
                             <Save className="w-4 h-4" /> Save Changes
                         </button>
@@ -120,6 +156,8 @@ const EditableText: React.FC<EditableTextProps> = ({
                 </div>
             </div>
         );
+
+        return createPortal(modalContent, document.body);
     };
 
     return (
