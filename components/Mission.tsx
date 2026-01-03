@@ -1,6 +1,6 @@
 import React from 'react';
-import { ClubData, SiteContent, Pillar, Officer } from '../types';
-import { User } from 'lucide-react';
+import { ClubData, SiteContent, Pillar, Officer, MissionPillar } from '../types';
+import { User, Plane, Wrench, Navigation, Rocket, Shield, Cpu, Globe, Zap } from 'lucide-react';
 import EditableText from './EditableText';
 import EditableImage from './EditableImage';
 
@@ -8,13 +8,23 @@ interface MissionProps {
     data: ClubData;
     isAdmin: boolean;
     onUpdate: (key: keyof SiteContent, value: string) => void;
+    onUpdateMissionPillar: (id: string, field: keyof MissionPillar, value: string) => void;
     onUpdatePillar: (id: string, field: keyof Pillar, value: string) => void;
     onUpdateOfficer: (id: string, field: keyof Officer, value: string) => void;
 }
 
-const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdatePillar, onUpdateOfficer }) => {
-    const currentYear = new Date().getFullYear();
+const iconMap: { [key: string]: any } = {
+    Plane,
+    Wrench,
+    Navigation,
+    Rocket,
+    Shield,
+    Cpu,
+    Globe,
+    Zap
+};
 
+const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdateMissionPillar, onUpdatePillar, onUpdateOfficer }) => {
     return (
         <div className="min-h-screen pt-20 bg-surface relative overflow-hidden">
             {/* Blueprint Grid Background */}
@@ -44,11 +54,47 @@ const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdatePill
                 </div>
             </div>
 
-            {/* Core Pillars */}
+            {/* Dynamic Mission Pillars (formerly Feature Boxes) */}
             <section className="py-20 px-6 lg:px-8 relative z-10">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {data.pillars.map((item) => (
+                        {(data.missionPillars || []).map((item) => {
+                            const IconComponent = iconMap[item.icon] || Plane;
+                            return (
+                                <div key={item.id} className="group p-8 rounded-3xl bg-white border border-gray-100 shadow-card hover:shadow-hover transition-all duration-300 hover:-translate-y-2">
+                                    <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                                        <IconComponent className="w-7 h-7 text-primary" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold mb-4 font-mono text-contrast">
+                                        <EditableText
+                                            value={item.title}
+                                            onSave={(val) => onUpdateMissionPillar(item.id, 'title', val)}
+                                            isAdmin={isAdmin}
+                                            label="Pillar Title"
+                                        />
+                                    </h3>
+                                    <div className="text-secondary leading-relaxed">
+                                        <EditableText
+                                            value={item.description}
+                                            onSave={(val) => onUpdateMissionPillar(item.id, 'description', val)}
+                                            isAdmin={isAdmin}
+                                            label="Pillar Description"
+                                            multiline
+                                        />
+                                    </div>
+                                    <div className="mt-8 w-12 h-1 bg-primary/20 rounded-full group-hover:w-full transition-all duration-500"></div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </section>
+
+            {/* Core Technical Pillars (the ones with images) */}
+            <section className="py-20 px-6 lg:px-8 relative z-10 bg-gray-50/50">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {(data.pillars || []).map((item) => (
                             <div key={item.id} className="group rounded-3xl bg-white border border-gray-100 shadow-card hover:shadow-hover transition-all duration-300 hover:-translate-y-2 overflow-hidden flex flex-col h-full">
                                 {/* Image Area */}
                                 <div className="h-48 w-full overflow-hidden relative">
@@ -96,7 +142,7 @@ const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdatePill
                     <div className="w-full rounded-3xl overflow-hidden shadow-2xl relative group bg-gray-200 h-[400px]">
                         <EditableImage
                             src={data.siteContent.missionBannerUrl || "https://images.unsplash.com/photo-1464746109676-23191284eb3b?q=80&w=2072&auto=format&fit=crop"}
-                            alt="Aviation Club Team"
+                            alt="Aviation Club"
                             onSave={(val) => onUpdate('missionBannerUrl', val)}
                             isAdmin={isAdmin}
                             className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"

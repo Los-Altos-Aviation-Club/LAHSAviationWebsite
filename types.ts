@@ -71,11 +71,12 @@ export interface TickerItem {
     type: 'wind' | 'zap' | 'users';
 }
 
-export interface FeatureBox {
+export interface MissionPillar {
     id: string;
     icon: string;
     title: string;
     description: string;
+    imageUrl?: string;
 }
 
 export interface ClubData {
@@ -85,7 +86,7 @@ export interface ClubData {
     siteContent: SiteContent;
     pillars: Pillar[];
     tickerItems: TickerItem[];
-    featureBoxes: FeatureBox[];
+    missionPillars: MissionPillar[];
     googleCalendarUrl: string;
     discordUrl: string;
 }

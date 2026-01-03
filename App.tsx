@@ -8,17 +8,81 @@ import Events from './components/Meetings';
 import Contact from './components/Contact';
 import AdminPortal from './components/AdminPortal';
 import Footer from './components/Footer';
-import { ClubData, SiteContent, Project, Meeting, Pillar, Officer, TickerItem, FeatureBox } from './types';
+import { ClubData, SiteContent, Project, Meeting, Pillar, Officer, TickerItem, MissionPillar } from './types';
 import { Plane } from 'lucide-react';
 import { ARCHIVE_RAW_BASE_URL } from './constants';
 
 // --- Mock Data ---
 const INITIAL_DATA: ClubData = {
     projects: [
-        // ... (truncated for brevity in my thought, but I'll provide full block below)
+        {
+            id: '1',
+            title: 'High Altitude Rocketry',
+            description: 'Designing and building a dual-deployment rocket capable of reaching 10,000 feet with telemetry logging.',
+            status: 'In Progress',
+            operationalStatus: 'Active',
+            imageUrl: 'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?q=80&w=2070&auto=format&fit=crop',
+            specs: [
+                { label: 'Apogee', value: '10,000ft' },
+                { label: 'Motor', value: 'L-Class' },
+                { label: 'Recovery', value: 'Dual Deploy' }
+            ],
+            leadEngineer: 'Aiden Chen',
+            estCompletion: 'June 2025'
+        },
+        {
+            id: '2',
+            title: 'Fixed-Wing UAV',
+            description: 'Long-endurance carbon fiber drone for autonomous survey missions and aerial mapping.',
+            status: 'In Progress',
+            operationalStatus: 'Active',
+            imageUrl: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?q=80&w=2070&auto=format&fit=crop',
+            specs: [
+                { label: 'Wingspan', value: '1.8m' },
+                { label: 'Battery', value: '6S 10Ah' },
+                { label: 'Range', value: '15km' }
+            ],
+            leadEngineer: 'Maya Rodriguez',
+            estCompletion: 'March 2025'
+        },
+        {
+            id: '3',
+            title: 'Vertical Takeoff System',
+            description: 'Experimental quad-plane hybrid for efficient forward flight and VTOL capabilities.',
+            status: 'Concept',
+            operationalStatus: 'Active',
+            imageUrl: 'https://images.unsplash.com/photo-1473968512647-3e447244af8f?q=80&w=2070&auto=format&fit=crop',
+            specs: [
+                { label: 'Payload', value: '1.5kg' },
+                { label: 'Flight Time', value: '45min' },
+                { label: 'Controller', value: 'ArduPilot' }
+            ],
+            leadEngineer: 'Liam Smith',
+            estCompletion: 'Sept 2025'
+        }
     ],
     officers: [
-        // ...
+        {
+            id: '1',
+            name: 'Aiden Chen',
+            role: 'President',
+            email: 'aiden@example.com',
+            imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop'
+        },
+        {
+            id: '2',
+            name: 'Maya Rodriguez',
+            role: 'Engineering Lead',
+            email: 'maya@example.com',
+            imageUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2070&auto=format&fit=crop'
+        },
+        {
+            id: '3',
+            name: 'Liam Smith',
+            role: 'Logistics',
+            email: 'liam@example.com',
+            imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=2070&auto=format&fit=crop'
+        }
     ],
     meetings: [
         {
@@ -67,7 +131,7 @@ const INITIAL_DATA: ClubData = {
         { id: '2', label: 'Next Launch', value: 'OCT 25', type: 'zap' },
         { id: '3', label: 'Members', value: '45+ Active', type: 'users' }
     ],
-    featureBoxes: [
+    missionPillars: [
         {
             id: '1',
             icon: 'Plane',
@@ -156,20 +220,6 @@ const MainContent: React.FC = () => {
                 if (response.ok) {
                     const remoteData = await response.json();
 
-                    // We need to know when remote data was last updated. 
-                    // GitHub doesn't easily give file mtime via raw URL without API, 
-                    // but we can check if localStorage is "newer" than some baseline 
-                    // or if we should prioritize local changes.
-                    // For now, if local data exists and remote exists, we merge or decide.
-                    // The prompt says: "prioritize localStorage if it's newer than the GitHub data"
-                    // Since we don't have remote timestamp easily here, we'll assume remote is "fresh" 
-                    // UNLESS local data exists. If local data is newer than a few minutes or 
-                    // if we want to be safe, we use local.
-
-                    // Better approach: If localData exists, use it. 
-                    // However, we want to sync with remote too.
-                    // If remote data has a 'lastUpdated' field, that would be ideal.
-
                     const remoteTimestamp = remoteData.lastUpdated ? new Date(remoteData.lastUpdated).getTime() : 0;
 
                     const finalData = (localData && localTimestamp > remoteTimestamp) ? localData : remoteData;
@@ -207,7 +257,7 @@ const MainContent: React.FC = () => {
                             meetings: filteredMeetings.length > 0 ? filteredMeetings : (finalData.meetings || prev.meetings),
                             pillars: finalData.pillars || prev.pillars,
                             tickerItems: finalData.tickerItems || prev.tickerItems,
-                            featureBoxes: finalData.featureBoxes || prev.featureBoxes
+                            missionPillars: finalData.missionPillars || prev.missionPillars || prev.featureBoxes || []
                         };
                     });
 
@@ -292,10 +342,10 @@ const MainContent: React.FC = () => {
         }));
     };
 
-    const updateFeatureBox = (id: string, field: keyof FeatureBox, value: string) => {
+    const updateMissionPillar = (id: string, field: keyof MissionPillar, value: string) => {
         setData(prev => ({
             ...prev,
-            featureBoxes: (prev.featureBoxes || []).map(b => {
+            missionPillars: (prev.missionPillars || []).map(b => {
                 if (b.id !== id) return b;
                 return { ...b, [field]: value };
             })
@@ -317,7 +367,6 @@ const MainContent: React.FC = () => {
                                     isAdmin={isAdmin}
                                     onUpdate={updateSiteContent}
                                     onUpdateTicker={updateTicker}
-                                    onUpdateFeatureBox={updateFeatureBox}
                                     setGameMode={setIsGameMode}
                                 />
                             }
@@ -329,6 +378,7 @@ const MainContent: React.FC = () => {
                                     data={data}
                                     isAdmin={isAdmin}
                                     onUpdate={updateSiteContent}
+                                    onUpdateMissionPillar={updateMissionPillar}
                                     onUpdatePillar={updatePillar}
                                     onUpdateOfficer={updateOfficer}
                                 />
