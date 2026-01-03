@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ClubData, Project, Meeting } from '../types';
-import { LogOut, Plus, Trash2, ChevronLeft, Loader2, CheckCircle, AlertCircle, Image as ImageIcon, RefreshCw, Github, FolderPlus, Send, Calendar } from 'lucide-react';
+import { LogOut, Plus, Trash2, ChevronLeft, Loader2, CheckCircle, AlertCircle, Image as ImageIcon, RefreshCw, Github, FolderPlus, Send, Calendar, CloudSync } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ARCHIVE_REPO, ARCHIVE_GITHUB_API_BASE_URL, PROJECTS_BASE_PATH } from '../constants';
 
@@ -21,8 +21,31 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
     const [githubToken, setGithubToken] = useState<string>(() => localStorage.getItem('gh_pat') || '');
     const [initStatus, setInitStatus] = useState<Record<string, 'loading' | 'success' | 'error' | 'none'>>({});
     const [isBulkSyncing, setIsBulkSyncing] = useState(false);
-    const [saveStatus, setSaveStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'unsaved'>('idle');
     const [saveError, setSaveError] = useState('');
+    const lastDataRef = useRef<string>(JSON.stringify(data));
+    const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Debounced Auto-Sync
+    useEffect(() => {
+        if (!isAdmin) return;
+
+        const currentDataStr = JSON.stringify(data);
+        if (currentDataStr !== lastDataRef.current) {
+            setSaveStatus('unsaved');
+            lastDataRef.current = currentDataStr;
+
+            if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+
+            syncTimeoutRef.current = setTimeout(() => {
+                handleSaveToGitHub(true);
+            }, 10000); // 10 seconds
+        }
+
+        return () => {
+            if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+        };
+    }, [data, isAdmin]);
 
     // Recurring Scheduler State
     const [recurringType, setRecurringType] = useState<'Daily' | 'Weekly' | 'Monthly'>('Weekly');
@@ -55,10 +78,12 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
         return hashHex;
     }
 
-    const handleSaveToGitHub = async () => {
+    const handleSaveToGitHub = async (isAutoSync = false) => {
         if (!githubToken) {
-            alert('Please add a GitHub Personal Access Token in the Settings tab first.');
-            setActiveTab('settings');
+            if (!isAutoSync) {
+                alert('Please add a GitHub Personal Access Token in the Settings tab first.');
+                setActiveTab('settings');
+            }
             return;
         }
 
@@ -78,10 +103,16 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
             const fileData = await getRes.json();
             const currentSha = fileData.sha;
 
+            // Add timestamp to data for sync tracking
+            const dataToSave = {
+                ...data,
+                lastUpdated: new Date().toISOString()
+            };
+
             // 2. Prepare the new content
             let content: string;
             try {
-                content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+                content = btoa(unescape(encodeURIComponent(JSON.stringify(dataToSave, null, 2))));
             } catch (encodingErr) {
                 console.error('Encoding error:', encodingErr);
                 throw new Error('Failed to encode data for GitHub. This might be due to unsupported special characters.');
@@ -92,7 +123,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                 method: 'PUT',
                 headers,
                 body: JSON.stringify({
-                    message: `Update metadata.json from Admin Portal [${new Date().toISOString()}]`,
+                    message: `${isAutoSync ? 'Auto-sync' : 'Manual update'} metadata.json from Admin Portal [${new Date().toISOString()}]`,
                     content: content,
                     sha: currentSha
                 })
@@ -104,6 +135,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
             }
 
             setSaveStatus('success');
+            lastDataRef.current = JSON.stringify(data); // Sync the ref to prevent immediate re-trigger
             setTimeout(() => setSaveStatus('idle'), 5000);
 
         } catch (err: any) {
@@ -395,6 +427,46 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                     {isArchiveLoaded ? 'Archive Connected' : 'Local Mode'}
                                 </span>
                             </div>
+
+                            {/* Auto-Sync Status Pill */}
+                            <div className={`flex items-center gap-1.5 px-2.5 py-1 border rounded-full shadow-sm transition-all duration-300 ${saveStatus === 'unsaved' ? 'bg-amber-50 border-amber-200 text-amber-700' :
+                                    saveStatus === 'loading' ? 'bg-blue-50 border-blue-200 text-blue-700' :
+                                        saveStatus === 'success' ? 'bg-green-50 border-green-200 text-green-700' :
+                                            saveStatus === 'error' ? 'bg-red-50 border-red-200 text-red-700' :
+                                                'bg-gray-50 border-gray-100 text-gray-400'
+                                }`}>
+                                {saveStatus === 'unsaved' && (
+                                    <>
+                                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                        <span className="text-[10px] font-bold uppercase tracking-wider">Unsaved Changes</span>
+                                    </>
+                                )}
+                                {saveStatus === 'loading' && (
+                                    <>
+                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                        <span className="text-[10px] font-bold uppercase tracking-wider">Saving to GitHub...</span>
+                                    </>
+                                )}
+                                {saveStatus === 'success' && (
+                                    <>
+                                        <CheckCircle className="w-3 h-3" />
+                                        <span className="text-[10px] font-bold uppercase tracking-wider">Saved to GitHub</span>
+                                    </>
+                                )}
+                                {saveStatus === 'error' && (
+                                    <>
+                                        <AlertCircle className="w-3 h-3" />
+                                        <span className="text-[10px] font-bold uppercase tracking-wider">Save Failed</span>
+                                    </>
+                                )}
+                                {saveStatus === 'idle' && (
+                                    <>
+                                        <CloudSync className="w-3 h-3" />
+                                        <span className="text-[10px] font-bold uppercase tracking-wider">Sync Ready</span>
+                                    </>
+                                )}
+                            </div>
+
                             <a
                                 href={`https://github.com/${ARCHIVE_REPO}`}
                                 target="_blank"
@@ -408,7 +480,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                     </div>
                     <div className="flex items-center gap-4">
                         <button
-                            onClick={handleSaveToGitHub}
+                            onClick={() => handleSaveToGitHub(false)}
                             disabled={saveStatus === 'loading'}
                             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-lg ${saveStatus === 'success' ? 'bg-green-500 text-white shadow-green-500/20' :
                                 saveStatus === 'error' ? 'bg-red-500 text-white shadow-red-500/20' :

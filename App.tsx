@@ -102,18 +102,59 @@ const MainContent: React.FC = () => {
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [isArchiveLoaded, setIsArchiveLoaded] = useState(false);
 
+    // Persist to localStorage whenever data changes
+    useEffect(() => {
+        if (isDataLoaded) {
+            localStorage.setItem('club_data_v1', JSON.stringify(data));
+            localStorage.setItem('club_data_timestamp', new Date().toISOString());
+        }
+    }, [data, isDataLoaded]);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // Check localStorage first
+                const localDataStr = localStorage.getItem('club_data_v1');
+                const localTimestampStr = localStorage.getItem('club_data_timestamp');
+                let localData: ClubData | null = null;
+                let localTimestamp = 0;
+
+                if (localDataStr && localTimestampStr) {
+                    try {
+                        localData = JSON.parse(localDataStr);
+                        localTimestamp = new Date(localTimestampStr).getTime();
+                    } catch (e) {
+                        console.error('Error parsing local data:', e);
+                    }
+                }
+
                 const response = await fetch(`${ARCHIVE_RAW_BASE_URL}/metadata.json`);
                 if (response.ok) {
                     const remoteData = await response.json();
+
+                    // We need to know when remote data was last updated. 
+                    // GitHub doesn't easily give file mtime via raw URL without API, 
+                    // but we can check if localStorage is "newer" than some baseline 
+                    // or if we should prioritize local changes.
+                    // For now, if local data exists and remote exists, we merge or decide.
+                    // The prompt says: "prioritize localStorage if it's newer than the GitHub data"
+                    // Since we don't have remote timestamp easily here, we'll assume remote is "fresh" 
+                    // UNLESS local data exists. If local data is newer than a few minutes or 
+                    // if we want to be safe, we use local.
+
+                    // Better approach: If localData exists, use it. 
+                    // However, we want to sync with remote too.
+                    // If remote data has a 'lastUpdated' field, that would be ideal.
+
+                    const remoteTimestamp = remoteData.lastUpdated ? new Date(remoteData.lastUpdated).getTime() : 0;
+
+                    const finalData = (localData && localTimestamp > remoteTimestamp) ? localData : remoteData;
 
                     // Auto-pruning logic: Filter out meetings older than current date
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
 
-                    const filteredMeetings = (remoteData.meetings || []).filter((m: Meeting) => {
+                    const filteredMeetings = (finalData.meetings || []).filter((m: Meeting) => {
                         const meetingDate = new Date(m.date);
                         // Ensure date is valid before filtering
                         if (isNaN(meetingDate.getTime())) return true;
@@ -123,7 +164,7 @@ const MainContent: React.FC = () => {
 
                     // Deep merge remote data with initial data to prevent missing field crashes
                     setData(prev => {
-                        const mergedProjects = (remoteData.projects || prev.projects).map((p: Project) => ({
+                        const mergedProjects = (finalData.projects || prev.projects).map((p: Project) => ({
                             ...p,
                             specs: p.specs || [],
                             operationalStatus: p.operationalStatus || 'Active'
@@ -131,24 +172,27 @@ const MainContent: React.FC = () => {
 
                         return {
                             ...prev,
-                            ...remoteData,
+                            ...finalData,
                             siteContent: {
                                 ...prev.siteContent,
-                                ...(remoteData.siteContent || {})
+                                ...(finalData.siteContent || {})
                             },
                             // Ensure arrays exist if remote data is partial
                             projects: mergedProjects,
-                            officers: remoteData.officers || prev.officers,
-                            meetings: filteredMeetings.length > 0 ? filteredMeetings : (remoteData.meetings || prev.meetings),
-                            pillars: remoteData.pillars || prev.pillars,
-                            tickerItems: remoteData.tickerItems || prev.tickerItems
+                            officers: finalData.officers || prev.officers,
+                            meetings: filteredMeetings.length > 0 ? filteredMeetings : (finalData.meetings || prev.meetings),
+                            pillars: finalData.pillars || prev.pillars,
+                            tickerItems: finalData.tickerItems || prev.tickerItems
                         };
                     });
 
                     setIsArchiveLoaded(true);
-                    console.log('Loaded data from Archive Repository');
+                    console.log('Loaded data from ' + (localData && localTimestamp > remoteTimestamp ? 'LocalStorage' : 'Archive Repository'));
                 } else {
-                    console.warn('Failed to fetch metadata from Archive, using initial data');
+                    console.warn('Failed to fetch metadata from Archive, using local or initial data');
+                    if (localData) {
+                        setData(localData);
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching metadata:', error);
