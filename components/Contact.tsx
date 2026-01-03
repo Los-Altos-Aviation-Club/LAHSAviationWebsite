@@ -1,7 +1,8 @@
 import React from 'react';
 import { ClubData, SiteContent, Officer } from '../types';
-import { Mail, MessageSquare, User } from 'lucide-react';
+import { Mail, MessageSquare, User, Users } from 'lucide-react';
 import EditableText from './EditableText';
+import EditableImage from './EditableImage';
 
 interface ContactProps {
     data: ClubData;
@@ -11,6 +12,7 @@ interface ContactProps {
 }
 
 const Contact: React.FC<ContactProps> = ({ data, isAdmin, onUpdate, onUpdateOfficer }) => {
+    const primaryContactEmail = data.officers?.[0]?.email || 'aviation@lahs.edu';
     return (
         <div className="min-h-screen pt-32 pb-20 bg-white text-contrast relative overflow-hidden">
 
@@ -69,7 +71,7 @@ const Contact: React.FC<ContactProps> = ({ data, isAdmin, onUpdate, onUpdateOffi
                     </a>
 
                     <a
-                        href={`mailto:${data.officers[0].email}`}
+                        href={`mailto:${primaryContactEmail}`}
                         className="group p-8 rounded-3xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 p-8 opacity-5 text-contrast transform group-hover:scale-110 transition-transform">
@@ -91,42 +93,64 @@ const Contact: React.FC<ContactProps> = ({ data, isAdmin, onUpdate, onUpdateOffi
                 <div className="mb-20">
                     <div className="flex items-center gap-4 mb-8">
                         <div className="h-px flex-grow bg-gray-200"></div>
-                        <h2 className="text-lg font-mono font-bold text-secondary uppercase tracking-widest">Command Crew Directory</h2>
+                        <h2 className="text-lg font-mono font-bold text-secondary uppercase tracking-widest">Officer Directory</h2>
                         <div className="h-px flex-grow bg-gray-200"></div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {data.officers.map((officer) => (
-                            <div key={officer.id} className="bg-white p-5 rounded-2xl border border-gray-100 hover:border-primary/50 transition-all hover:shadow-md flex flex-col gap-2 group">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-secondary group-hover:bg-primary group-hover:text-white transition-colors">
-                                        <User className="w-4 h-4" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {(data.officers || []).map((officer) => (
+                            <div key={officer.id} className="bg-white p-6 rounded-3xl border border-gray-100 hover:border-primary/50 transition-all hover:shadow-xl flex flex-col gap-4 group">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-2xl overflow-hidden bg-surface flex items-center justify-center text-secondary group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-sm shrink-0">
+                                        {officer.imageUrl ? (
+                                            <EditableImage
+                                                src={officer.imageUrl}
+                                                alt={officer.name}
+                                                onSave={(val) => onUpdateOfficer(officer.id, 'imageUrl', val)}
+                                                isAdmin={isAdmin}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <Users className="w-6 h-6" />
+                                        )}
                                     </div>
-                                    <p className="text-xs font-mono text-primary font-bold uppercase tracking-wider">
-                                        <EditableText
-                                            value={officer.role}
-                                            onSave={(val) => onUpdateOfficer(officer.id, 'role', val)}
-                                            isAdmin={isAdmin}
-                                            label="Officer Role"
-                                        />
-                                    </p>
+                                    <div className="overflow-hidden">
+                                        <p className="text-[10px] font-mono text-primary font-bold uppercase tracking-widest truncate">
+                                            <EditableText
+                                                value={officer.role}
+                                                onSave={(val) => onUpdateOfficer(officer.id, 'role', val)}
+                                                isAdmin={isAdmin}
+                                                label="Officer Role"
+                                            />
+                                        </p>
+                                        <h3 className="text-lg font-bold text-contrast truncate">
+                                            <EditableText
+                                                value={officer.name}
+                                                onSave={(val) => onUpdateOfficer(officer.id, 'name', val)}
+                                                isAdmin={isAdmin}
+                                                label="Officer Name"
+                                            />
+                                        </h3>
+                                    </div>
                                 </div>
-                                <h3 className="text-lg font-bold text-contrast">
-                                    <EditableText
-                                        value={officer.name}
-                                        onSave={(val) => onUpdateOfficer(officer.id, 'name', val)}
-                                        isAdmin={isAdmin}
-                                        label="Officer Name"
-                                    />
-                                </h3>
-                                <div className="text-sm text-secondary hover:text-primary transition-colors flex items-center gap-2 mt-auto pt-2 border-t border-gray-50">
-                                    <Mail className="w-3 h-3" />
-                                    <EditableText
-                                        value={officer.email}
-                                        onSave={(val) => onUpdateOfficer(officer.id, 'email', val)}
-                                        isAdmin={isAdmin}
-                                        label="Officer Email"
-                                    />
+
+                                <div className="pt-4 border-t border-gray-50 mt-auto">
+                                    <a
+                                        href={`mailto:${officer.email}`}
+                                        className="text-sm text-secondary hover:text-primary transition-colors flex items-center gap-2 group/link"
+                                    >
+                                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover/link:bg-primary/10 transition-colors">
+                                            <Mail className="w-3.5 h-3.5" />
+                                        </div>
+                                        <div className="overflow-hidden">
+                                            <EditableText
+                                                value={officer.email}
+                                                onSave={(val) => onUpdateOfficer(officer.id, 'email', val)}
+                                                isAdmin={isAdmin}
+                                                label="Officer Email"
+                                            />
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
                         ))}

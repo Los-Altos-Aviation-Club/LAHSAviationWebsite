@@ -22,6 +22,7 @@ export interface Officer {
     name: string;
     role: string;
     email: string;
+    imageUrl?: string;
 }
 
 export interface Meeting {

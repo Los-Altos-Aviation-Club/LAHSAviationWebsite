@@ -294,6 +294,7 @@ const MainContent: React.FC = () => {
                                     isAdmin={isAdmin}
                                     onUpdate={updateSiteContent}
                                     onUpdatePillar={updatePillar}
+                                    onUpdateOfficer={updateOfficer}
                                 />
                             }
                         />
@@ -303,6 +304,7 @@ const MainContent: React.FC = () => {
                                 <Projects
                                     data={data}
                                     isAdmin={isAdmin}
+                                    onUpdate={updateSiteContent}
                                     onUpdateProject={updateProject}
                                 />
                             }

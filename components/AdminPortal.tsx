@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ClubData, Project, Meeting } from '../types';
-import { LogOut, Plus, Trash2, ChevronLeft, Loader2, CheckCircle, AlertCircle, Image as ImageIcon, RefreshCw, Github, FolderPlus, Send, Calendar, CloudSync } from 'lucide-react';
+import { ClubData, Project, Meeting, Officer } from '../types';
+import { LogOut, Plus, Trash2, ChevronLeft, Loader2, CheckCircle, AlertCircle, Image as ImageIcon, RefreshCw, Github, FolderPlus, Send, Calendar, CloudSync, Users, ArrowUp, ArrowDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ARCHIVE_REPO, ARCHIVE_GITHUB_API_BASE_URL, PROJECTS_BASE_PATH } from '../constants';
 
@@ -17,7 +17,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-    const [activeTab, setActiveTab] = useState<'projects' | 'meetings' | 'settings'>('projects');
+    const [activeTab, setActiveTab] = useState<'projects' | 'meetings' | 'team' | 'settings'>('projects');
     const [githubToken, setGithubToken] = useState<string>(() => localStorage.getItem('gh_pat') || '');
     const [initStatus, setInitStatus] = useState<Record<string, 'loading' | 'success' | 'error' | 'none'>>({});
     const [isBulkSyncing, setIsBulkSyncing] = useState(false);
@@ -309,6 +309,30 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
         updateData({ meetings: [...data.meetings, newMeeting] });
     };
 
+    const handleAddOfficer = () => {
+        const newOfficer: Officer = {
+            id: Date.now().toString(),
+            name: 'New Officer',
+            role: 'Officer',
+            email: 'email@example.com'
+        };
+        updateData({ officers: [...(data.officers || []), newOfficer] });
+    };
+
+    const handleDeleteOfficer = (id: string) => {
+        updateData({ officers: data.officers.filter(o => o.id !== id) });
+    };
+
+    const handleMoveOfficer = (index: number, direction: 'up' | 'down') => {
+        const newOfficers = [...data.officers];
+        const targetIndex = direction === 'up' ? index - 1 : index + 1;
+
+        if (targetIndex < 0 || targetIndex >= newOfficers.length) return;
+
+        [newOfficers[index], newOfficers[targetIndex]] = [newOfficers[targetIndex], newOfficers[index]];
+        updateData({ officers: newOfficers });
+    };
+
     const handleCreateRecurring = () => {
         const newMeetings: Meeting[] = [];
         let currentDate = new Date(recurringStartDate);
@@ -537,7 +561,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
 
                 {/* Tabs */}
                 <div className="flex border-b border-gray-200 mb-8 space-x-8 overflow-x-auto">
-                    {(['projects', 'meetings', 'settings'] as const).map(tab => (
+                    {(['projects', 'meetings', 'team', 'settings'] as const).map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
@@ -1027,6 +1051,104 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                     </div>
                                 ))}
                             </div>
+                        </div>
+                    )}
+
+                    {/* Team */}
+                    {activeTab === 'team' && (
+                        <div className="space-y-6">
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-sm font-bold text-secondary uppercase tracking-widest">Team Members / Officers</h3>
+                                <button onClick={handleAddOfficer} className="bg-white hover:bg-gray-50 text-contrast border border-gray-200 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm">
+                                    <Plus className="w-4 h-4" /> Add Officer
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                {(data.officers || []).map((officer, index) => (
+                                    <div key={officer.id} className="bg-white border border-gray-200 p-6 rounded-2xl flex items-center gap-6 shadow-sm group">
+                                        <div className="flex flex-col gap-2">
+                                            <button
+                                                onClick={() => handleMoveOfficer(index, 'up')}
+                                                disabled={index === 0}
+                                                className="p-1 text-gray-400 hover:text-primary disabled:opacity-30 disabled:hover:text-gray-400 transition-colors"
+                                                title="Move Up"
+                                            >
+                                                <ArrowUp className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleMoveOfficer(index, 'down')}
+                                                disabled={index === (data.officers?.length || 0) - 1}
+                                                className="p-1 text-gray-400 hover:text-primary disabled:opacity-30 disabled:hover:text-gray-400 transition-colors"
+                                                title="Move Down"
+                                            >
+                                                <ArrowDown className="w-4 h-4" />
+                                            </button>
+                                        </div>
+
+                                        <div className="w-16 h-16 rounded-full bg-surface flex items-center justify-center text-secondary shrink-0 overflow-hidden border border-gray-100">
+                                            {officer.imageUrl ? (
+                                                <img src={officer.imageUrl} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <Users className="w-6 h-6" />
+                                            )}
+                                        </div>
+
+                                        <div className="flex-grow grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Name</label>
+                                                <input
+                                                    className="bg-transparent text-sm font-bold text-contrast focus:outline-none border-b border-transparent focus:border-gray-100 pb-1"
+                                                    value={officer.name}
+                                                    onChange={(e) => {
+                                                        const newOfficers = [...data.officers];
+                                                        newOfficers[index].name = e.target.value;
+                                                        updateData({ officers: newOfficers });
+                                                    }}
+                                                    placeholder="Officer Name"
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Role</label>
+                                                <input
+                                                    className="bg-transparent text-sm text-secondary focus:outline-none border-b border-transparent focus:border-gray-100 pb-1"
+                                                    value={officer.role}
+                                                    onChange={(e) => {
+                                                        const newOfficers = [...data.officers];
+                                                        newOfficers[index].role = e.target.value;
+                                                        updateData({ officers: newOfficers });
+                                                    }}
+                                                    placeholder="e.g. President"
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Email</label>
+                                                <input
+                                                    className="bg-transparent text-sm text-secondary focus:outline-none border-b border-transparent focus:border-gray-100 pb-1"
+                                                    value={officer.email}
+                                                    onChange={(e) => {
+                                                        const newOfficers = [...data.officers];
+                                                        newOfficers[index].email = e.target.value;
+                                                        updateData({ officers: newOfficers });
+                                                    }}
+                                                    placeholder="email@example.com"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <button onClick={() => handleDeleteOfficer(officer.id)} className="text-red-400 hover:text-red-600 transition-colors p-2">
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {(!data.officers || data.officers.length === 0) && (
+                                <div className="text-center py-20 bg-white border border-dashed border-gray-200 rounded-3xl">
+                                    <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                                    <h3 className="text-lg font-medium text-contrast">No officers listed</h3>
+                                    <p className="text-secondary mt-2">Click "Add Officer" to begin building the team directory.</p>
+                                </div>
+                            )}
                         </div>
                     )}
 

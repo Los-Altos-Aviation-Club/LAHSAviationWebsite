@@ -1,5 +1,6 @@
 import React from 'react';
-import { ClubData, SiteContent, Pillar } from '../types';
+import { ClubData, SiteContent, Pillar, Officer } from '../types';
+import { User } from 'lucide-react';
 import EditableText from './EditableText';
 import EditableImage from './EditableImage';
 
@@ -8,9 +9,10 @@ interface MissionProps {
     isAdmin: boolean;
     onUpdate: (key: keyof SiteContent, value: string) => void;
     onUpdatePillar: (id: string, field: keyof Pillar, value: string) => void;
+    onUpdateOfficer: (id: string, field: keyof Officer, value: string) => void;
 }
 
-const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdatePillar }) => {
+const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdatePillar, onUpdateOfficer }) => {
     const currentYear = new Date().getFullYear();
 
     return (
@@ -94,7 +96,7 @@ const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdatePill
             {/* Meet the Team Section */}
             <section className="py-20 px-6 lg:px-8 bg-white border-t border-gray-100">
                 <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-12">
+                    <div className="text-center mb-16">
                         <h2 className="text-4xl md:text-5xl font-bold text-contrast mb-4">
                             <EditableText
                                 value={data.siteContent.missionTeamTitle}
@@ -103,20 +105,56 @@ const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdatePill
                                 label="Team Section Header"
                             />
                         </h2>
-                        <p className="text-secondary">
+                        <p className="text-secondary max-w-2xl mx-auto">
                             <EditableText
                                 value={data.siteContent.missionTeamSubtitle}
                                 onSave={(val) => onUpdate('missionTeamSubtitle', val)}
                                 isAdmin={isAdmin}
                                 label="Team Section Subtitle"
+                                multiline
                             />
                         </p>
                     </div>
 
-                    <div className="w-full rounded-3xl overflow-hidden shadow-2xl relative group bg-gray-200 h-[500px] md:h-[600px]">
-                        {/* Placeholder Image for Team */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {(data.officers || []).map((officer) => (
+                            <div key={officer.id} className="group relative">
+                                <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-gray-100 mb-4 shadow-sm group-hover:shadow-xl transition-all duration-500">
+                                    <EditableImage
+                                        src={officer.imageUrl || 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=2070&auto=format&fit=crop'}
+                                        alt={officer.name}
+                                        onSave={(val) => onUpdateOfficer(officer.id, 'imageUrl', val)}
+                                        isAdmin={isAdmin}
+                                        className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-110"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 pointer-events-none">
+                                        <p className="text-white/80 text-xs font-mono uppercase tracking-widest">{officer.role}</p>
+                                    </div>
+                                </div>
+                                <h3 className="text-xl font-bold text-contrast">
+                                    <EditableText
+                                        value={officer.name}
+                                        onSave={(val) => onUpdateOfficer(officer.id, 'name', val)}
+                                        isAdmin={isAdmin}
+                                        label="Officer Name"
+                                    />
+                                </h3>
+                                <p className="text-primary font-mono text-xs uppercase tracking-wider mb-2">
+                                    <EditableText
+                                        value={officer.role}
+                                        onSave={(val) => onUpdateOfficer(officer.id, 'role', val)}
+                                        isAdmin={isAdmin}
+                                        label="Officer Role"
+                                    />
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="mt-20 w-full rounded-3xl overflow-hidden shadow-2xl relative group bg-gray-200 h-[400px]">
+                        {/* Club Identity Banner */}
                         <img
-                            src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=2070&auto=format&fit=crop"
+                            src="https://images.unsplash.com/photo-1464746109676-23191284eb3b?q=80&w=2072&auto=format&fit=crop"
                             alt="Aviation Club Team"
                             className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
                         />

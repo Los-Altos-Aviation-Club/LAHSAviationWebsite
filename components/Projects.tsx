@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ClubData, Project } from '../types';
+import { ClubData, Project, SiteContent } from '../types';
 import { ArrowRight, ChevronLeft, Tag, FileText, Layout, Image as ImageIcon, Calendar, X, Maximize2 } from 'lucide-react';
 import EditableText from './EditableText';
 import EditableImage from './EditableImage';
@@ -17,10 +17,11 @@ interface ProjectUpdate {
 interface ProjectsProps {
     data: ClubData;
     isAdmin: boolean;
+    onUpdate: (key: keyof SiteContent, value: string) => void;
     onUpdateProject: (id: string, field: keyof Project | 'specs', value: any) => void;
 }
 
-const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) => {
+const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdate, onUpdateProject }) => {
     const location = useLocation();
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [activeProjectView, setActiveProjectView] = useState<'details' | 'updates'>('details');
@@ -402,10 +403,31 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
             {/* Header (Background for List View) */}
             <div className="bg-surface border-b border-gray-100 py-16 px-6">
                 <div className="max-w-7xl mx-auto">
-                    <h2 className="text-sm font-mono text-primary mb-2 uppercase tracking-widest">/// Project Access</h2>
-                    <h1 className="text-5xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-primary via-blue-500 to-sky-400">Active Development</h1>
+                    <h2 className="text-sm font-mono text-primary mb-2 uppercase tracking-widest">
+                        <EditableText
+                            value={data.siteContent.marqueeText || '/// Project Access'}
+                            onSave={(val) => onUpdate('marqueeText', val)}
+                            isAdmin={isAdmin}
+                            label="Marquee Text"
+                        />
+                    </h2>
+                    <h1 className="text-5xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-primary via-blue-500 to-sky-400">
+                        <EditableText
+                            value={data.siteContent.meetingsTitle || 'Active Development'}
+                            onSave={(val) => onUpdate('meetingsTitle', val)}
+                            isAdmin={isAdmin}
+                            label="Projects Page Title"
+                            className="!text-primary"
+                        />
+                    </h1>
                     <p className="text-xl text-secondary mt-4 max-w-2xl font-light">
-                        Current engineering efforts in rocketry, fixed-wing aircraft, and multi-rotor systems.
+                        <EditableText
+                            value={data.siteContent.meetingsSubtitle || 'Current engineering efforts in rocketry, fixed-wing aircraft, and multi-rotor systems.'}
+                            onSave={(val) => onUpdate('meetingsSubtitle', val)}
+                            isAdmin={isAdmin}
+                            label="Projects Page Subtitle"
+                            multiline
+                        />
                     </p>
                 </div>
             </div>
