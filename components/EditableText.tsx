@@ -112,10 +112,11 @@ const EditableText: React.FC<EditableTextProps> = ({
             <span
                 onContextMenu={handleRightClick}
                 className={`${className} ${isAdmin ? 'cursor-context-menu hover:outline-dashed hover:outline-2 hover:outline-primary/50 hover:bg-primary/5 rounded px-1 -mx-1 transition-all relative inline-block min-w-[1em] min-h-[1em]' : ''}`}
+                style={isAdmin ? { color: 'inherit', WebkitTextFillColor: 'currentcolor' } : {}}
                 title={isAdmin ? "Right-click to edit" : undefined}
             >
                 {(children || value) || (isAdmin && (
-                    <span className="opacity-50 italic text-sm">Click to Edit</span>
+                    <span className="opacity-50 italic text-sm text-inherit" style={{ WebkitTextFillColor: 'currentcolor' }}>Click to Edit</span>
                 ))}
             </span>
             {renderModal()}

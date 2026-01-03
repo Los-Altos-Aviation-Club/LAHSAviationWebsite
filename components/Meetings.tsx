@@ -27,6 +27,7 @@ const Meetings: React.FC<MeetingsProps> = ({ data, isAdmin, onUpdate, onUpdateMe
                             onSave={(val) => onUpdate('meetingsTitle', val)}
                             isAdmin={isAdmin}
                             label="Meetings Header"
+                            className="!text-primary"
                         />
                     </h3>
                     <p className="mt-4 text-secondary">

@@ -62,7 +62,7 @@ const Home: React.FC<HomeProps> = ({ data, isAdmin, onUpdate, onUpdateTicker, se
                             onSave={(val) => onUpdate('homeHeroTitle', val)}
                             isAdmin={isAdmin}
                             label="Hero Title"
-                            className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-blue-500 to-sky-400 pb-2 inline-block"
+                            className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-blue-500 to-sky-400 pb-2 inline-block !text-primary"
                         />
                         <div className="h-4"></div> {/* Spacer */}
                         <div className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-blue-400 to-sky-300 relative text-5xl md:text-7xl">

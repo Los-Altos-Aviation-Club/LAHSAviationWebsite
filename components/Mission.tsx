@@ -30,6 +30,7 @@ const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdatePill
                             onSave={(val) => onUpdate('missionTitle', val)}
                             isAdmin={isAdmin}
                             label="Mission Header"
+                            className="!text-primary"
                         />
                     </h1>
                     <div className="text-xl text-secondary max-w-2xl mx-auto font-light">
