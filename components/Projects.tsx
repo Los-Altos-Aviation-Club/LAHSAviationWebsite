@@ -43,6 +43,17 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
         }
     }, [selectedId, activeProjectView]);
 
+    useEffect(() => {
+        const handleEsc = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setSelectedId(null);
+                setActiveProjectView('details');
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, []);
+
     const fetchProjectUpdates = async (projectId: string) => {
         setIsLoadingUpdates(true);
         const project = data.projects.find(p => p.id === projectId);
@@ -87,9 +98,19 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
                     }
 
                     // Parse folder name for date and title: YYYY-MM-DD-Title
+                    let date = 'Undated';
+                    let title = folder.name.replace(/-/g, ' ');
+
                     const dateMatch = folder.name.match(/^(\d{4}-\d{2}-\d{2})-(.*)$/);
-                    const date = dateMatch ? dateMatch[1] : 'Unknown Date';
-                    const title = dateMatch ? dateMatch[2].replace(/-/g, ' ') : folder.name.replace(/-/g, ' ');
+                    const exactDateMatch = folder.name.match(/^(\d{4}-\d{2}-\d{2})$/);
+
+                    if (dateMatch) {
+                        date = dateMatch[1];
+                        title = dateMatch[2].replace(/-/g, ' ');
+                    } else if (exactDateMatch) {
+                        date = exactDateMatch[1];
+                        title = 'Project Update';
+                    }
 
                     return {
                         id: folder.name,
@@ -124,9 +145,20 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
         <div className="min-h-screen pt-20 bg-white relative">
 
             {/* Full Screen Project Detail Overlay */}
-            <div className={`fixed inset-0 z-50 bg-white overflow-y-auto transition-transform duration-500 ease-in-out ${selectedProject ? 'translate-y-0' : 'translate-y-full'}`}>
-                {selectedProject && (
-                    <div className="min-h-screen relative">
+            {selectedProject && (
+                <div
+                    className={`fixed inset-0 z-50 bg-white/40 backdrop-blur-sm overflow-y-auto transition-all duration-500 ease-in-out ${selectedProject ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) {
+                            setSelectedId(null);
+                            setActiveProjectView('details');
+                        }
+                    }}
+                >
+                    <div
+                        className={`min-h-screen bg-white transition-transform duration-500 ease-in-out ${selectedProject ? 'translate-y-0' : 'translate-y-full'}`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         {/* Close Button / Header */}
                         <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 py-4 flex justify-between items-center">
                             <button
@@ -222,12 +254,23 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
                                             <p className="text-secondary mt-2">Create dated folders in <code>/projects/{slugify(selectedProject.title)}/</code> to add logs.</p>
                                         </div>
                                     )}
+
+                                    {/* Back Button in Updates View */}
+                                    <div className="mt-16 pt-12 border-t border-gray-100 flex justify-center">
+                                        <button
+                                            onClick={() => { setSelectedId(null); setActiveProjectView('details'); }}
+                                            className="group flex items-center gap-3 px-8 py-4 bg-surface hover:bg-white text-secondary hover:text-primary rounded-2xl border border-gray-100 transition-all font-mono text-sm uppercase tracking-widest shadow-sm hover:shadow-md"
+                                        >
+                                            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                                            Back to Projects
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
 
             {/* Header (Background for List View) */}
             <div className="bg-surface border-b border-gray-100 py-16 px-6">
