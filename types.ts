@@ -9,11 +9,12 @@ export interface Project {
     title: string;
     description: string;
     status: 'In Progress' | 'Completed' | 'Concept';
-    operationalStatus: 'Active' | 'On Hold' | 'Abandoned';
+    operationalStatus: 'Active' | 'On Hold' | 'Abandoned' | 'Completed';
     imageUrl?: string;
     specs: Spec[];
     leadEngineer?: string;
-    completionDate?: string;
+    estCompletion?: string;
+    completionDate?: string; // Add this to match AdminPortal.tsx usage
 }
 
 export interface Officer {

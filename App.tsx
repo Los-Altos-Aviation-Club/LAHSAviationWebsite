@@ -28,7 +28,7 @@ const INITIAL_DATA: ClubData = {
                 { label: 'Recovery', value: 'Dual Deploy' }
             ],
             leadEngineer: 'A. Yeager',
-            completionDate: 'Q4 2024'
+            estCompletion: 'Q4 2024'
         },
         {
             id: '2',
@@ -43,7 +43,7 @@ const INITIAL_DATA: ClubData = {
                 { label: 'Runtime', value: '15 mins' }
             ],
             leadEngineer: 'S. Pilot',
-            completionDate: 'Completed'
+            estCompletion: 'Completed'
         },
         {
             id: '3',
@@ -58,7 +58,7 @@ const INITIAL_DATA: ClubData = {
                 { label: 'Channels', value: '4 (TAER)' }
             ],
             leadEngineer: 'J. Sky',
-            completionDate: 'Q1 2025'
+            estCompletion: 'Q1 2025'
         }
     ],
     officers: [

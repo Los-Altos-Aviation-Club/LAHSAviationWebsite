@@ -482,6 +482,36 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                                 ID: {slugify(project.title)}
                                             </div>
                                         </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Lead Engineer</label>
+                                                <input
+                                                    className="w-full bg-transparent text-sm text-secondary focus:outline-none border-b border-gray-100 pb-1"
+                                                    value={project.leadEngineer || ''}
+                                                    onChange={(e) => {
+                                                        const newProjects = [...data.projects];
+                                                        newProjects[index].leadEngineer = e.target.value;
+                                                        updateData({ projects: newProjects });
+                                                    }}
+                                                    placeholder="Name"
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Est. Completion</label>
+                                                <input
+                                                    className="w-full bg-transparent text-sm text-secondary focus:outline-none border-b border-gray-100 pb-1"
+                                                    value={project.estCompletion || ''}
+                                                    onChange={(e) => {
+                                                        const newProjects = [...data.projects];
+                                                        newProjects[index].estCompletion = e.target.value;
+                                                        updateData({ projects: newProjects });
+                                                    }}
+                                                    placeholder="TBD / Date"
+                                                />
+                                            </div>
+                                        </div>
+
                                         <div className="flex items-center gap-2 text-sm text-gray-400 bg-gray-50 p-2 rounded-lg">
                                             <ImageIcon className="w-4 h-4 shrink-0" />
                                             <input
@@ -544,6 +574,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                                     <option value="Active">Active</option>
                                                     <option value="On Hold">On Hold</option>
                                                     <option value="Abandoned">Abandoned</option>
+                                                    <option value="Completed">Completed</option>
                                                 </select>
                                             </div>
                                         </div>

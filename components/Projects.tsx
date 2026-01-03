@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ClubData, Project } from '../types';
-import { ArrowRight, ChevronLeft, Tag, FileText, Layout, Image as ImageIcon, Calendar } from 'lucide-react';
+import { ArrowRight, ChevronLeft, Tag, FileText, Layout, Image as ImageIcon, Calendar, X, Maximize2 } from 'lucide-react';
 import EditableText from './EditableText';
 import EditableImage from './EditableImage';
 import { GITHUB_RAW_BASE_URL, GITHUB_API_BASE_URL, PROJECTS_BASE_PATH } from '../constants';
@@ -26,6 +26,7 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
     const [activeProjectView, setActiveProjectView] = useState<'details' | 'updates'>('details');
     const [projectUpdates, setProjectUpdates] = useState<ProjectUpdate[]>([]);
     const [isLoadingUpdates, setIsLoadingUpdates] = useState(false);
+    const [expandedMedia, setExpandedMedia] = useState<string | null>(null);
 
     const selectedProject = data?.projects?.find(p => p.id === selectedId);
 
@@ -326,13 +327,35 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
                                                                     </div>
 
                                                                     {(update.media && update.media.length > 0) && (
-                                                                        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                                        <div className={`mt-8 grid gap-4 ${update.media.length === 1 ? 'grid-cols-1' :
+                                                                            update.media.length === 2 ? 'grid-cols-1 sm:grid-cols-2' :
+                                                                                'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                                                                            }`}>
                                                                             {update.media.map((item, mIdx) => (
-                                                                                <div key={mIdx} className="group relative bg-surface rounded-xl overflow-hidden border border-gray-100 aspect-video shadow-sm">
+                                                                                <div
+                                                                                    key={mIdx}
+                                                                                    className={`group relative bg-surface rounded-xl overflow-hidden border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-md ${item.type === 'image' ? 'cursor-zoom-in' : ''
+                                                                                        } ${update.media.length === 1 ? 'aspect-video max-h-[500px]' : 'aspect-square'}`}
+                                                                                    onClick={() => item.type === 'image' && setExpandedMedia(item.url)}
+                                                                                >
                                                                                     {item.type === 'image' ? (
-                                                                                        <img src={item.url} alt={item.name || 'Update image'} className="w-full h-full object-cover" loading="lazy" />
+                                                                                        <>
+                                                                                            <img src={item.url} alt={item.name || 'Update image'} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                                                                                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                                                                <div className="bg-white/90 p-2 rounded-full text-primary transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                                                                                                    <Maximize2 className="w-5 h-5" />
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </>
                                                                                     ) : (
-                                                                                        <video src={item.url} className="w-full h-full object-cover" controls />
+                                                                                        <div className="w-full h-full relative">
+                                                                                            <video
+                                                                                                src={item.url}
+                                                                                                className="w-full h-full object-cover"
+                                                                                                controls
+                                                                                                playsInline
+                                                                                            />
+                                                                                        </div>
                                                                                     )}
                                                                                 </div>
                                                                             ))}
@@ -438,7 +461,7 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
                             {/* Text Content (Preview) */}
                             <div className="w-full lg:w-2/5 space-y-6">
                                 <div className="flex items-center gap-3">
-                                    <span className={`h-2 w-2 rounded-full ${project.status === 'Completed' ? 'bg-green-500 shadow-[0_0_10px_#22c55e]' :
+                                    <span className={`h-2 w-2 rounded-full ${project.operationalStatus === 'Completed' || project.status === 'Completed' ? 'bg-green-500 shadow-[0_0_10px_#22c55e]' :
                                         project.status === 'In Progress' ? 'bg-blue-500 shadow-[0_0_10px_#3b82f6]' :
                                             project.status === 'Concept' ? 'bg-amber-500 shadow-[0_0_10px_#f59e0b]' :
                                                 'bg-gray-400'
@@ -470,8 +493,8 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
                                             <p className="text-xs font-mono text-gray-400 uppercase">Est. Completion</p>
                                             <div className="text-sm font-medium">
                                                 <EditableText
-                                                    value={project.completionDate || 'TBD'}
-                                                    onSave={(val) => onUpdateProject(project.id, 'completionDate', val)}
+                                                    value={project.estCompletion || 'TBD'}
+                                                    onSave={(val) => onUpdateProject(project.id, 'estCompletion', val)}
                                                     isAdmin={isAdmin}
                                                     label="Completion Date"
                                                 />
@@ -491,6 +514,27 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
                     ))}
                 </div>
             </section>
+
+            {/* Media Lightbox */}
+            {expandedMedia && (
+                <div
+                    className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+                    onClick={() => setExpandedMedia(null)}
+                >
+                    <button
+                        onClick={() => setExpandedMedia(null)}
+                        className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors bg-white/10 p-2 rounded-full backdrop-blur-md"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                    <img
+                        src={expandedMedia}
+                        alt="Expanded view"
+                        className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-scale-in"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
+            )}
         </div>
     );
 };
