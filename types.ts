@@ -39,9 +39,17 @@ export interface Meeting {
 export interface SiteContent {
     homeHeroTitle: string;
     homeHeroSubtitle: string;
+    missionTitle: string;
     missionStatement: string;
+    missionTeamTitle: string;
+    missionTeamSubtitle: string;
+    meetingsTitle: string;
+    meetingsSubtitle: string;
     contactTitle: string;
     contactSubtitle: string;
+    navbarTitle: string;
+    navbarSubtitle: string;
+    marqueeText: string;
 }
 
 export interface Pillar {

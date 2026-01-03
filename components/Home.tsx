@@ -9,9 +9,10 @@ interface HomeProps {
     isAdmin: boolean;
     onUpdate: (key: keyof SiteContent, value: string) => void;
     onUpdateTicker: (id: string, field: keyof TickerItem, value: string) => void;
+    setGameMode: (val: boolean) => void;
 }
 
-const Home: React.FC<HomeProps> = ({ data, isAdmin, onUpdate, onUpdateTicker }) => {
+const Home: React.FC<HomeProps> = ({ data, isAdmin, onUpdate, onUpdateTicker, setGameMode }) => {
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
@@ -65,7 +66,17 @@ const Home: React.FC<HomeProps> = ({ data, isAdmin, onUpdate, onUpdateTicker }) 
                         />
                         <div className="h-4"></div> {/* Spacer */}
                         <div className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-blue-400 to-sky-300 relative text-5xl md:text-7xl">
-                            . . .
+                            <button
+                                onContextMenu={(e) => {
+                                    if (isAdmin) {
+                                        e.preventDefault();
+                                        setGameMode(true);
+                                    }
+                                }}
+                                className="cursor-default"
+                            >
+                                . . .
+                            </button>
                         </div>
                     </div>
 
@@ -95,28 +106,38 @@ const Home: React.FC<HomeProps> = ({ data, isAdmin, onUpdate, onUpdateTicker }) 
             <div className="w-full bg-contrast py-3 overflow-hidden border-y border-white/10 relative z-20">
                 <div className="flex animate-ticker whitespace-nowrap">
                     {[...Array(4)].map((_, repeatIdx) => (
-                        <div key={repeatIdx} className="flex">
-                            {data.tickerItems.map((item) => (
-                                <div key={`${repeatIdx}-${item.id}`} className="flex items-center gap-8 mx-4">
-                                    <span className="text-white/80 font-mono text-sm uppercase tracking-widest flex items-center gap-2">
-                                        {getIcon(item.type)}
-                                        <EditableText
-                                            value={item.label}
-                                            onSave={(val) => onUpdateTicker(item.id, 'label', val)}
-                                            isAdmin={isAdmin}
-                                            label="Ticker Label"
-                                            className="hover:text-white"
-                                        />:
-                                        <EditableText
-                                            value={item.value}
-                                            onSave={(val) => onUpdateTicker(item.id, 'value', val)}
-                                            isAdmin={isAdmin}
-                                            label="Ticker Value"
-                                            className="hover:text-white"
-                                        />
-                                    </span>
-                                </div>
-                            ))}
+                        <div key={repeatIdx} className="flex items-center">
+                            <span className="text-white/80 font-mono text-sm uppercase tracking-widest flex items-center gap-8 mx-4">
+                                <EditableText
+                                    value={data.siteContent.marqueeText}
+                                    onSave={(val) => onUpdate('marqueeText', val)}
+                                    isAdmin={isAdmin}
+                                    label="Marquee Text"
+                                    className="hover:text-white"
+                                />
+                                {data.tickerItems.map((item) => (
+                                    <React.Fragment key={`${repeatIdx}-${item.id}`}>
+                                        <span className="flex items-center gap-2">
+                                            {getIcon(item.type)}
+                                            <EditableText
+                                                value={item.label}
+                                                onSave={(val) => onUpdateTicker(item.id, 'label', val)}
+                                                isAdmin={isAdmin}
+                                                label="Ticker Label"
+                                                className="hover:text-white"
+                                            />:
+                                            <EditableText
+                                                value={item.value}
+                                                onSave={(val) => onUpdateTicker(item.id, 'value', val)}
+                                                isAdmin={isAdmin}
+                                                label="Ticker Value"
+                                                className="hover:text-white"
+                                            />
+                                        </span>
+                                        <span className="mx-4 text-white/20">•</span>
+                                    </React.Fragment>
+                                ))}
+                            </span>
                         </div>
                     ))}
                 </div>

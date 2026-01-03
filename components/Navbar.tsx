@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Plane, Compass, LayoutDashboard } from 'lucide-react';
+import { ClubData, SiteContent } from '../types';
+import EditableText from './EditableText';
 
 interface NavbarProps {
+    data: ClubData;
+    onUpdate: (key: keyof SiteContent, value: string) => void;
     isAdmin: boolean;
     isGameMode?: boolean;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ isAdmin, isGameMode = false }) => {
+const Navbar: React.FC<NavbarProps> = ({ data, onUpdate, isAdmin, isGameMode = false }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrollProgress, setScrollProgress] = useState(0);
     const location = useLocation();
@@ -69,7 +73,19 @@ const Navbar: React.FC<NavbarProps> = ({ isAdmin, isGameMode = false }) => {
                         <div className={`absolute inset-0 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${isGameMode ? 'bg-[#39ff14]/20' : 'bg-primary/20'}`}></div>
                         <Plane className={`h-5 w-5 transform group-hover:-rotate-45 transition-transform duration-500 ease-out relative z-10 ${iconClass}`} />
                         <span className={`font-bold text-lg tracking-tight relative z-10 ${logoClass}`}>
-                            LAHS <span className={`${subTextClass} font-medium`}>Aviation Club</span>
+                            <EditableText
+                                value={data.siteContent.navbarTitle}
+                                onSave={(val) => onUpdate('navbarTitle', val)}
+                                isAdmin={isAdmin}
+                                label="Navbar Title"
+                            /> <span className={`${subTextClass} font-medium`}>
+                                <EditableText
+                                    value={data.siteContent.navbarSubtitle}
+                                    onSave={(val) => onUpdate('navbarSubtitle', val)}
+                                    isAdmin={isAdmin}
+                                    label="Navbar Subtitle"
+                                />
+                            </span>
                         </span>
                     </button>
 

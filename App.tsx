@@ -70,9 +70,17 @@ const INITIAL_DATA: ClubData = {
     siteContent: {
         homeHeroTitle: 'We Build Things That Fly',
         homeHeroSubtitle: 'Los Altos High School Aviation Club. Designing drones, rockets, and the next generation of aerospace engineers.',
+        missionTitle: 'Our Mission',
         missionStatement: 'Bridging the gap between theoretical physics and real-world aerospace engineering through hands-on fabrication and flight testing.',
+        missionTeamTitle: 'Meet the Team',
+        missionTeamSubtitle: 'The pilots, engineers, and dreamers behind the projects.',
+        meetingsTitle: 'Upcoming Departures',
+        meetingsSubtitle: 'Workshops, launches, and guest speakers.',
         contactTitle: 'Clear for Takeoff?',
-        contactSubtitle: 'We are looking for students passionate about engineering, design, and flight. No prior experience is required—just curiosity.'
+        contactSubtitle: 'We are looking for students passionate about engineering, design, and flight. No prior experience is required—just curiosity.',
+        navbarTitle: 'LAHS',
+        navbarSubtitle: 'Aviation Club',
+        marqueeText: 'Welcome to the Los Altos High School Aviation Club • Join us every Tuesday in Room 702 • Engineering the future of flight • Blue Skies Ahead'
     },
     googleCalendarUrl: 'https://calendar.google.com',
     discordUrl: 'https://discord.gg/example'
@@ -219,7 +227,7 @@ const MainContent: React.FC = () => {
         <>
             <ScrollToTop />
             <div className={`min-h-screen flex flex-col font-sans transition-colors duration-500 ${isGameMode ? 'bg-black text-[#39ff14]' : 'bg-background text-contrast'} selection:bg-primary/20 selection:text-primary-dark`}>
-                {!isGameMode && <Navbar isAdmin={isAdmin} isGameMode={isGameMode} />}
+                {!isGameMode && <Navbar data={data} onUpdate={updateSiteContent} isAdmin={isAdmin} isGameMode={isGameMode} />}
                 <main className="flex-grow">
                     <Routes>
                         <Route
@@ -261,6 +269,7 @@ const MainContent: React.FC = () => {
                                 <Events
                                     data={data}
                                     isAdmin={isAdmin}
+                                    onUpdate={updateSiteContent}
                                     onUpdateMeeting={updateMeeting}
                                 />
                             }

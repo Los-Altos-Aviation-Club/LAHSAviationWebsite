@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ClubData, Meeting } from '../types';
+import { ClubData, Meeting, SiteContent } from '../types';
 import { MapPin, Calendar, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
 import EditableText from './EditableText';
 import EditableImage from './EditableImage';
@@ -7,10 +7,11 @@ import EditableImage from './EditableImage';
 interface MeetingsProps {
     data: ClubData;
     isAdmin: boolean;
+    onUpdate: (key: keyof SiteContent, value: string) => void;
     onUpdateMeeting: (id: string, field: keyof Meeting, value: any) => void;
 }
 
-const Meetings: React.FC<MeetingsProps> = ({ data, isAdmin, onUpdateMeeting }) => {
+const Meetings: React.FC<MeetingsProps> = ({ data, isAdmin, onUpdate, onUpdateMeeting }) => {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
     return (
@@ -20,8 +21,23 @@ const Meetings: React.FC<MeetingsProps> = ({ data, isAdmin, onUpdateMeeting }) =
                 {/* Header */}
                 <div className="mb-16 text-center">
                     <h2 className="text-sm font-mono text-primary mb-2 uppercase tracking-widest">/// Logbook</h2>
-                    <h3 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-primary via-blue-500 to-sky-400 pb-2">Upcoming Departures</h3>
-                    <p className="mt-4 text-secondary">Workshops, launches, and guest speakers.</p>
+                    <h3 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-primary via-blue-500 to-sky-400 pb-2">
+                        <EditableText
+                            value={data.siteContent.meetingsTitle}
+                            onSave={(val) => onUpdate('meetingsTitle', val)}
+                            isAdmin={isAdmin}
+                            label="Meetings Header"
+                        />
+                    </h3>
+                    <p className="mt-4 text-secondary">
+                        <EditableText
+                            value={data.siteContent.meetingsSubtitle}
+                            onSave={(val) => onUpdate('meetingsSubtitle', val)}
+                            isAdmin={isAdmin}
+                            label="Meetings Subtitle"
+                            multiline
+                        />
+                    </p>
                 </div>
 
                 <div className="grid gap-8">
