@@ -1,6 +1,7 @@
 # LAHS Aviation Website
 
 This repository contains the source code for the LAHS Aviation Website.
+
 Currently located at https://lahsaviation.dpdns.org/    
 
 ## Local Development

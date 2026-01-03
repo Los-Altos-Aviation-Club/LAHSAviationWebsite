@@ -141,13 +141,13 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
                                     onClick={() => setActiveProjectView('details')}
                                     className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${activeProjectView === 'details' ? 'bg-white text-primary shadow-sm' : 'text-secondary hover:text-contrast'}`}
                                 >
-                                    <Layout className="w-3.5 h-3.5" /> Specifications
+                                    <Layout className="w-3.5 h-3.5" /> Overview
                                 </button>
                                 <button
                                     onClick={() => setActiveProjectView('updates')}
                                     className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${activeProjectView === 'updates' ? 'bg-white text-primary shadow-sm' : 'text-secondary hover:text-contrast'}`}
                                 >
-                                    <Calendar className="w-3.5 h-3.5" /> Project Updates
+                                    <Calendar className="w-3.5 h-3.5" /> Project Progress
                                 </button>
                             </div>
 
@@ -269,12 +269,21 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
                                             <p>SYS: ONLINE</p>
                                         </div>
 
-                                        <button
-                                            onClick={() => setSelectedId(project.id)}
-                                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-black px-6 py-2 font-mono font-bold uppercase hover:bg-primary hover:text-white transition-colors"
-                                        >
-                                            Access Schematics
-                                        </button>
+                                        <div className="flex flex-col gap-4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[200px]">
+                                            <button
+                                                onClick={() => { setSelectedId(project.id); setActiveProjectView('details'); }}
+                                                className="w-full bg-white text-black px-6 py-2 font-mono font-bold uppercase hover:bg-primary hover:text-white transition-colors"
+                                            >
+                                                View Project
+                                            </button>
+                                            <button
+                                                disabled
+                                                className="w-full bg-black/60 backdrop-blur-md text-white/50 border border-white/10 px-6 py-2 font-mono font-bold uppercase cursor-not-allowed text-center"
+                                                title="Technical data pending..."
+                                            >
+                                                Schematics Pending
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -324,10 +333,10 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
                                 </div>
 
                                 <button
-                                    onClick={() => setSelectedId(project.id)}
+                                    onClick={() => { setSelectedId(project.id); setActiveProjectView('details'); }}
                                     className="text-primary font-medium flex items-center gap-2 hover:gap-3 transition-all group-hover:text-primary-dark pt-2"
                                 >
-                                    View Specs <ArrowRight className="w-4 h-4" />
+                                    View Project <ArrowRight className="w-4 h-4" />
                                 </button>
                             </div>
                         </div>
