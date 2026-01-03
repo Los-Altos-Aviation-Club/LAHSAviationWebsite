@@ -23,7 +23,7 @@ const Meetings: React.FC<MeetingsProps> = ({ data, isAdmin, onUpdate, onUpdateMe
                     <h2 className="text-sm font-mono text-primary mb-2 uppercase tracking-widest">/// Logbook</h2>
                     <h3 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-primary via-blue-500 to-sky-400 pb-2">
                         <EditableText
-                            value={data.siteContent.meetingsTitle}
+                            value={data.siteContent.meetingsTitle || 'Upcoming Departures'}
                             onSave={(val) => onUpdate('meetingsTitle', val)}
                             isAdmin={isAdmin}
                             label="Meetings Header"
@@ -32,7 +32,7 @@ const Meetings: React.FC<MeetingsProps> = ({ data, isAdmin, onUpdate, onUpdateMe
                     </h3>
                     <p className="mt-4 text-secondary">
                         <EditableText
-                            value={data.siteContent.meetingsSubtitle}
+                            value={data.siteContent.meetingsSubtitle || 'Workshops, launches, and guest speakers.'}
                             onSave={(val) => onUpdate('meetingsSubtitle', val)}
                             isAdmin={isAdmin}
                             label="Meetings Subtitle"

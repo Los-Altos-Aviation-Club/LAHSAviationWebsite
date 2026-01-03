@@ -28,7 +28,7 @@ const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdatePill
                     </div>
                     <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 text-transparent bg-clip-text bg-gradient-to-br from-primary via-blue-500 to-sky-400">
                         <EditableText
-                            value={data.siteContent.missionTitle}
+                            value={data.siteContent.missionTitle || 'Our Mission'}
                             onSave={(val) => onUpdate('missionTitle', val)}
                             isAdmin={isAdmin}
                             label="Mission Header"
@@ -37,7 +37,7 @@ const Mission: React.FC<MissionProps> = ({ data, isAdmin, onUpdate, onUpdatePill
                     </h1>
                     <div className="text-xl text-secondary max-w-2xl mx-auto font-light">
                         <EditableText
-                            value={data.siteContent.missionStatement}
+                            value={data.siteContent.missionStatement || ''}
                             onSave={(val) => onUpdate('missionStatement', val)}
                             isAdmin={isAdmin}
                             label="Mission Statement"

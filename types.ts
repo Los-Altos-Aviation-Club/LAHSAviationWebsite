@@ -46,6 +46,9 @@ export interface SiteContent {
     missionTeamSubtitle: string;
     meetingsTitle: string;
     meetingsSubtitle: string;
+    projectsTitle: string;
+    projectsSubtitle: string;
+    projectsMarquee: string;
     contactTitle: string;
     contactSubtitle: string;
     navbarTitle: string;

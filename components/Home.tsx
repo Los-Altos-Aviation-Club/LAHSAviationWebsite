@@ -58,7 +58,7 @@ const Home: React.FC<HomeProps> = ({ data, isAdmin, onUpdate, onUpdateTicker, se
                 <div className="relative z-10 max-w-5xl mx-auto space-y-8 fade-in">
                     <div className="text-6xl md:text-8xl font-bold tracking-tighter leading-none pb-4">
                         <EditableText
-                            value={data.siteContent.homeHeroTitle}
+                            value={data.siteContent.homeHeroTitle || 'We Build Things That Fly'}
                             onSave={(val) => onUpdate('homeHeroTitle', val)}
                             isAdmin={isAdmin}
                             label="Hero Title"
@@ -82,7 +82,7 @@ const Home: React.FC<HomeProps> = ({ data, isAdmin, onUpdate, onUpdateTicker, se
 
                     <div className="text-xl md:text-2xl text-secondary max-w-2xl mx-auto font-light leading-relaxed">
                         <EditableText
-                            value={data.siteContent.homeHeroSubtitle}
+                            value={data.siteContent.homeHeroSubtitle || 'Los Altos High School Aviation Club.'}
                             onSave={(val) => onUpdate('homeHeroSubtitle', val)}
                             isAdmin={isAdmin}
                             label="Hero Subtitle"

@@ -540,7 +540,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                     <div className="flex gap-2 items-start">
                         <div className="font-bold shrink-0">Info:</div>
                         <div>
-                            To edit website text (Hero titles, mission statements), simply <strong>Right-Click</strong> on the text directly on the website while logged in.
+                            To edit website text (Hero titles, mission statements), simply <strong>Double-Click</strong> on the text directly on the website while logged in.
                         </div>
                     </div>
                     {saveStatus === 'error' && (
@@ -1196,8 +1196,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                             Use the <strong>"Save to GitHub"</strong> button at the top right to force an immediate update. This is the only way to ensure the public website sees your changes.
                                         </li>
                                         <li className="flex gap-2">
-                                            <span className="font-bold">4. Right-Click Editing:</span>
-                                            You don't need to be in this portal to edit text. When logged in, navigate to any page and <strong>Right-Click</strong> on headlines or descriptions to edit them in-place.
+                                            <span className="font-bold">4. Double-Click Editing:</span>
+                                            You don't need to be in this portal to edit text. When logged in, navigate to any page and <strong>Double-Click</strong> on headlines or descriptions to edit them in-place.
                                         </li>
                                     </ul>
                                 </div>

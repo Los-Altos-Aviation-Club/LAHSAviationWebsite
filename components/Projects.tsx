@@ -405,16 +405,16 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdate, onUpdatePr
                 <div className="max-w-7xl mx-auto">
                     <h2 className="text-sm font-mono text-primary mb-2 uppercase tracking-widest">
                         <EditableText
-                            value={data.siteContent.marqueeText || '/// Project Access'}
-                            onSave={(val) => onUpdate('marqueeText', val)}
+                            value={data.siteContent.projectsMarquee || '/// Project Access'}
+                            onSave={(val) => onUpdate('projectsMarquee', val)}
                             isAdmin={isAdmin}
                             label="Marquee Text"
                         />
                     </h2>
                     <h1 className="text-5xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-primary via-blue-500 to-sky-400">
                         <EditableText
-                            value={data.siteContent.meetingsTitle || 'Active Development'}
-                            onSave={(val) => onUpdate('meetingsTitle', val)}
+                            value={data.siteContent.projectsTitle || 'Active Development'}
+                            onSave={(val) => onUpdate('projectsTitle', val)}
                             isAdmin={isAdmin}
                             label="Projects Page Title"
                             className="!text-primary"
@@ -422,8 +422,8 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdate, onUpdatePr
                     </h1>
                     <p className="text-xl text-secondary mt-4 max-w-2xl font-light">
                         <EditableText
-                            value={data.siteContent.meetingsSubtitle || 'Current engineering efforts in rocketry, fixed-wing aircraft, and multi-rotor systems.'}
-                            onSave={(val) => onUpdate('meetingsSubtitle', val)}
+                            value={data.siteContent.projectsSubtitle || 'Current engineering efforts in rocketry, fixed-wing aircraft, and multi-rotor systems.'}
+                            onSave={(val) => onUpdate('projectsSubtitle', val)}
                             isAdmin={isAdmin}
                             label="Projects Page Subtitle"
                             multiline
