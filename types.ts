@@ -1,66 +1,67 @@
 
 export interface Spec {
-  label: string;
-  value: string;
+    label: string;
+    value: string;
 }
 
 export interface Project {
-  id: string;
-  title: string;
-  description: string;
-  status: 'In Progress' | 'Completed' | 'Concept';
-  imageUrl?: string;
-  specs?: Spec[];
-  leadEngineer?: string;
-  completionDate?: string;
+    id: string;
+    title: string;
+    description: string;
+    status: 'In Progress' | 'Completed' | 'Concept';
+    operationalStatus: 'Active' | 'On Hold' | 'Abandoned';
+    imageUrl?: string;
+    specs: Spec[];
+    leadEngineer?: string;
+    completionDate?: string;
 }
 
 export interface Officer {
-  id: string;
-  name: string;
-  role: string;
-  email: string;
+    id: string;
+    name: string;
+    role: string;
+    email: string;
 }
 
 export interface Event {
-  id: string;
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  description: string;
-  imageUrl?: string;
+    id: string;
+    title: string;
+    date: string;
+    time: string;
+    location: string;
+    description: string;
+    imageUrl?: string;
 }
 
 export interface SiteContent {
-  homeHeroTitle: string;
-  homeHeroSubtitle: string;
-  missionStatement: string;
-  contactTitle: string;
-  contactSubtitle: string;
+    homeHeroTitle: string;
+    homeHeroSubtitle: string;
+    missionStatement: string;
+    contactTitle: string;
+    contactSubtitle: string;
 }
 
 export interface Pillar {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
+    id: string;
+    title: string;
+    description: string;
+    imageUrl: string;
 }
 
 export interface TickerItem {
-  id: string;
-  label: string;
-  value: string;
-  type: 'wind' | 'zap' | 'users';
+    id: string;
+    label: string;
+    value: string;
+    type: 'wind' | 'zap' | 'users';
 }
 
 export interface ClubData {
-  projects: Project[];
-  officers: Officer[];
-  events: Event[];
-  siteContent: SiteContent;
-  pillars: Pillar[];
-  tickerItems: TickerItem[];
-  googleCalendarUrl: string;
-  discordUrl: string;
+    projects: Project[];
+    officers: Officer[];
+    events: Event[];
+    siteContent: SiteContent;
+    pillars: Pillar[];
+    tickerItems: TickerItem[];
+    googleCalendarUrl: string;
+    discordUrl: string;
 }

@@ -241,7 +241,13 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
             title: 'New Project',
             description: 'Project description goes here.',
             status: 'In Progress',
-            imageUrl: 'https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2070&auto=format&fit=crop'
+            operationalStatus: 'Active',
+            imageUrl: 'https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2070&auto=format&fit=crop',
+            specs: [
+                { label: 'Apogee', value: 'TBD' },
+                { label: 'Motor', value: 'TBD' },
+                { label: 'Recovery', value: 'TBD' }
+            ]
         };
         updateData({ projects: [...data.projects, newProject] });
     };
@@ -507,20 +513,95 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                                 /{PROJECTS_BASE_PATH}/{slugify(project.title)}/
                                             </code>
                                         </div>
-                                        <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                                            <select
-                                                className="bg-transparent text-xs text-secondary focus:outline-none cursor-pointer"
-                                                value={project.status}
-                                                onChange={(e) => {
-                                                    const newProjects = [...data.projects];
-                                                    newProjects[index].status = e.target.value as any;
-                                                    updateData({ projects: newProjects });
-                                                }}
-                                            >
-                                                <option value="Concept">Concept</option>
-                                                <option value="In Progress">In Progress</option>
-                                                <option value="Completed">Completed</option>
-                                            </select>
+                                        <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-2 border-t border-gray-100">
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Lifecycle Stage</label>
+                                                <select
+                                                    className="bg-transparent text-xs text-secondary focus:outline-none cursor-pointer font-medium"
+                                                    value={project.status}
+                                                    onChange={(e) => {
+                                                        const newProjects = [...data.projects];
+                                                        newProjects[index].status = e.target.value as any;
+                                                        updateData({ projects: newProjects });
+                                                    }}
+                                                >
+                                                    <option value="Concept">Concept</option>
+                                                    <option value="In Progress">In Progress</option>
+                                                    <option value="Completed">Completed</option>
+                                                </select>
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Operational Status</label>
+                                                <select
+                                                    className="bg-transparent text-xs text-secondary focus:outline-none cursor-pointer font-medium"
+                                                    value={project.operationalStatus}
+                                                    onChange={(e) => {
+                                                        const newProjects = [...data.projects];
+                                                        newProjects[index].operationalStatus = e.target.value as any;
+                                                        updateData({ projects: newProjects });
+                                                    }}
+                                                >
+                                                    <option value="Active">Active</option>
+                                                    <option value="On Hold">On Hold</option>
+                                                    <option value="Abandoned">Abandoned</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-3 pt-4 border-t border-gray-100">
+                                            <div className="flex justify-between items-center">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Technical Specs</label>
+                                                <button
+                                                    onClick={() => {
+                                                        const newProjects = [...data.projects];
+                                                        newProjects[index].specs = [...(newProjects[index].specs || []), { label: '', value: '' }];
+                                                        updateData({ projects: newProjects });
+                                                    }}
+                                                    className="text-[10px] text-primary hover:text-blue-700 font-bold uppercase flex items-center gap-1"
+                                                >
+                                                    <Plus className="w-3 h-3" /> Add Spec
+                                                </button>
+                                            </div>
+                                            <div className="grid grid-cols-1 gap-2">
+                                                {project.specs.map((spec, sIdx) => (
+                                                    <div key={sIdx} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg group/spec">
+                                                        <input
+                                                            className="w-1/3 bg-transparent text-[11px] font-bold text-contrast focus:outline-none"
+                                                            value={spec.label}
+                                                            onChange={(e) => {
+                                                                const newProjects = [...data.projects];
+                                                                newProjects[index].specs[sIdx].label = e.target.value;
+                                                                updateData({ projects: newProjects });
+                                                            }}
+                                                            placeholder="Label"
+                                                        />
+                                                        <div className="w-[1px] h-3 bg-gray-200" />
+                                                        <input
+                                                            className="flex-grow bg-transparent text-[11px] text-secondary focus:outline-none"
+                                                            value={spec.value}
+                                                            onChange={(e) => {
+                                                                const newProjects = [...data.projects];
+                                                                newProjects[index].specs[sIdx].value = e.target.value;
+                                                                updateData({ projects: newProjects });
+                                                            }}
+                                                            placeholder="Value"
+                                                        />
+                                                        <button
+                                                            onClick={() => {
+                                                                const newProjects = [...data.projects];
+                                                                newProjects[index].specs = newProjects[index].specs.filter((_, i) => i !== sIdx);
+                                                                updateData({ projects: newProjects });
+                                                            }}
+                                                            className="opacity-0 group-hover/spec:opacity-100 text-red-400 hover:text-red-600 transition-opacity"
+                                                        >
+                                                            <Trash2 className="w-3 h-3" />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="flex justify-end pt-2">
                                             <button onClick={() => handleDeleteProject(project.id)} className="text-red-500 hover:text-red-700 transition-colors">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>

@@ -20,6 +20,7 @@ const INITIAL_DATA: ClubData = {
             title: 'High-Altitude Rocketry',
             description: 'Design and construction of a Level 1 certification rocket capable of reaching 3,000 ft agl. Features dual-deployment recovery system.',
             status: 'In Progress',
+            operationalStatus: 'Active',
             imageUrl: 'https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2070&auto=format&fit=crop',
             specs: [
                 { label: 'Apogee', value: '3,200 ft' },
@@ -34,6 +35,7 @@ const INITIAL_DATA: ClubData = {
             title: 'Autonomous Drone Swarm',
             description: 'Programming a fleet of micro-drones for coordinated flight patterns using Python and open-source flight controllers.',
             status: 'Completed',
+            operationalStatus: 'Active',
             imageUrl: 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop',
             specs: [
                 { label: 'Count', value: '12 Units' },
@@ -48,6 +50,7 @@ const INITIAL_DATA: ClubData = {
             title: 'RC Cessna Trainer',
             description: 'Scratch-build of a fixed-wing trainer aircraft for new pilots to learn aerodynamics and control surfaces.',
             status: 'Concept',
+            operationalStatus: 'Active',
             imageUrl: 'https://images.unsplash.com/photo-1559685323-952403666b6c?q=80&w=2070&auto=format&fit=crop',
             specs: [
                 { label: 'Wingspan', value: '1.4m' },
