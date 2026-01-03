@@ -8,7 +8,7 @@ import Events from './components/Meetings';
 import Contact from './components/Contact';
 import AdminPortal from './components/AdminPortal';
 import Footer from './components/Footer';
-import { ClubData, SiteContent, Project, Meeting, Pillar, Officer, TickerItem, MissionPillar } from './types';
+import { ClubData, SiteContent, Project, Meeting, Pillar, Officer, TickerItem, MissionCard } from './types';
 import { Plane } from 'lucide-react';
 import { ARCHIVE_RAW_BASE_URL } from './constants';
 
@@ -131,24 +131,48 @@ const INITIAL_DATA: ClubData = {
         { id: '2', label: 'Next Launch', value: 'OCT 25', type: 'zap' },
         { id: '3', label: 'Members', value: '45+ Active', type: 'users' }
     ],
-    missionPillars: [
+    missionCards: [
         {
             id: '1',
+            type: 'icon',
             icon: 'Plane',
             title: 'Design',
             description: 'Learn the principles of aeronautics and use CAD software to design your own airframes.'
         },
         {
             id: '2',
+            type: 'icon',
             icon: 'Wrench',
             title: 'Build',
             description: 'Get hands-on experience with composite materials, electronics, and mechanical assembly.'
         },
         {
             id: '3',
+            type: 'icon',
             icon: 'Navigation',
             title: 'Fly',
             description: 'Take your creations to the skies and analyze flight data to improve performance.'
+        },
+        {
+            id: '4',
+            type: 'image',
+            imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop',
+            title: 'Avionics',
+            description: 'Development of custom flight computers, telemetry systems, and autonomous control logic for UAVs.'
+        },
+        {
+            id: '5',
+            type: 'image',
+            imageUrl: 'https://images.unsplash.com/photo-1559067515-bf7d799b6d42?q=80&w=2070&auto=format&fit=crop',
+            title: 'Aerodynamics',
+            description: 'Utilizing CFD analysis and wind tunnel testing to optimize airframe efficiency and stability.'
+        },
+        {
+            id: '6',
+            type: 'image',
+            imageUrl: 'https://images.unsplash.com/photo-1581092921461-eab62e97a782?q=80&w=2070&auto=format&fit=crop',
+            title: 'Crew Training',
+            description: 'Mentorship programs pairing senior engineers with new members to teach CAD, soldering, and piloting.'
         }
     ],
     siteContent: {
@@ -257,7 +281,7 @@ const MainContent: React.FC = () => {
                             meetings: filteredMeetings.length > 0 ? filteredMeetings : (finalData.meetings || prev.meetings),
                             pillars: finalData.pillars || prev.pillars,
                             tickerItems: finalData.tickerItems || prev.tickerItems,
-                            missionPillars: finalData.missionPillars || prev.missionPillars || prev.featureBoxes || []
+                            missionCards: finalData.missionCards || prev.missionCards || []
                         };
                     });
 
@@ -342,10 +366,10 @@ const MainContent: React.FC = () => {
         }));
     };
 
-    const updateMissionPillar = (id: string, field: keyof MissionPillar, value: string) => {
+    const updateMissionCard = (id: string, field: keyof MissionCard, value: string) => {
         setData(prev => ({
             ...prev,
-            missionPillars: (prev.missionPillars || []).map(b => {
+            missionCards: (prev.missionCards || []).map(b => {
                 if (b.id !== id) return b;
                 return { ...b, [field]: value };
             })
@@ -378,7 +402,7 @@ const MainContent: React.FC = () => {
                                     data={data}
                                     isAdmin={isAdmin}
                                     onUpdate={updateSiteContent}
-                                    onUpdateMissionPillar={updateMissionPillar}
+                                    onUpdateMissionCard={updateMissionCard}
                                     onUpdatePillar={updatePillar}
                                     onUpdateOfficer={updateOfficer}
                                 />

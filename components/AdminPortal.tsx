@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ClubData, Project, Meeting, Officer, MissionPillar } from '../types';
+import { ClubData, Project, Meeting, Officer, MissionCard } from '../types';
 import { LogOut, Plus, Trash2, ChevronLeft, Loader2, CheckCircle, AlertCircle, Image as ImageIcon, RefreshCw, Github, FolderPlus, Send, Calendar, CloudSync, Users, ArrowUp, ArrowDown, Layout } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ARCHIVE_REPO, ARCHIVE_GITHUB_API_BASE_URL, PROJECTS_BASE_PATH } from '../constants';
@@ -333,29 +333,30 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
         updateData({ officers: newOfficers });
     };
 
-    const handleAddMissionPillar = () => {
-        const newPillar: MissionPillar = {
+    const handleAddMissionCard = () => {
+        const newCard: MissionCard = {
             id: Date.now().toString(),
+            type: 'icon',
             icon: 'Plane',
-            title: 'New Pillar',
-            description: 'Pillar description goes here.',
+            title: 'New Card',
+            description: 'Card description goes here.',
             imageUrl: ''
         };
-        updateData({ missionPillars: [...(data.missionPillars || []), newPillar] });
+        updateData({ missionCards: [...(data.missionCards || []), newCard] });
     };
 
-    const handleDeleteMissionPillar = (id: string) => {
-        updateData({ missionPillars: (data.missionPillars || []).filter(b => b.id !== id) });
+    const handleDeleteMissionCard = (id: string) => {
+        updateData({ missionCards: (data.missionCards || []).filter(b => b.id !== id) });
     };
 
-    const handleMoveMissionPillar = (index: number, direction: 'up' | 'down') => {
-        const newPillars = [...(data.missionPillars || [])];
+    const handleMoveMissionCard = (index: number, direction: 'up' | 'down') => {
+        const newCards = [...(data.missionCards || [])];
         const targetIndex = direction === 'up' ? index - 1 : index + 1;
 
-        if (targetIndex < 0 || targetIndex >= newPillars.length) return;
+        if (targetIndex < 0 || targetIndex >= newCards.length) return;
 
-        [newPillars[index], newPillars[targetIndex]] = [newPillars[targetIndex], newPillars[index]];
-        updateData({ missionPillars: newPillars });
+        [newCards[index], newCards[targetIndex]] = [newCards[targetIndex], newCards[index]];
+        updateData({ missionCards: newCards });
     };
 
     const handleCreateRecurring = () => {
@@ -1177,21 +1178,21 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                         </div>
                     )}
 
-                    {/* Mission Pillars (formerly Feature Boxes) */}
+                    {/* Mission Cards (formerly Mission Pillars) */}
                     {activeTab === 'sections' && (
                         <div className="space-y-6">
                             <div className="flex justify-between items-center">
-                                <h3 className="text-sm font-bold text-secondary uppercase tracking-widest">Mission Page Pillars</h3>
-                                <button onClick={handleAddMissionPillar} className="bg-white hover:bg-gray-50 text-contrast border border-gray-200 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm">
-                                    <Plus className="w-4 h-4" /> Add Pillar
+                                <h3 className="text-sm font-bold text-secondary uppercase tracking-widest">Mission Cards</h3>
+                                <button onClick={handleAddMissionCard} className="bg-white hover:bg-gray-50 text-contrast border border-gray-200 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm">
+                                    <Plus className="w-4 h-4" /> Add Card
                                 </button>
                             </div>
                             <div className="grid grid-cols-1 gap-4">
-                                {(data.missionPillars || []).map((pillar, index) => (
-                                    <div key={pillar.id} className="bg-white border border-gray-200 p-6 rounded-2xl flex items-center gap-6 shadow-sm group">
+                                {(data.missionCards || []).map((card, index) => (
+                                    <div key={card.id} className="bg-white border border-gray-200 p-6 rounded-2xl flex items-center gap-6 shadow-sm group">
                                         <div className="flex flex-col gap-2">
                                             <button
-                                                onClick={() => handleMoveMissionPillar(index, 'up')}
+                                                onClick={() => handleMoveMissionCard(index, 'up')}
                                                 disabled={index === 0}
                                                 className="p-1 text-gray-400 hover:text-primary disabled:opacity-30 disabled:hover:text-gray-400 transition-colors"
                                                 title="Move Up"
@@ -1199,8 +1200,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                                 <ArrowUp className="w-4 h-4" />
                                             </button>
                                             <button
-                                                onClick={() => handleMoveMissionPillar(index, 'down')}
-                                                disabled={index === (data.missionPillars?.length || 0) - 1}
+                                                onClick={() => handleMoveMissionCard(index, 'down')}
+                                                disabled={index === (data.missionCards?.length || 0) - 1}
                                                 className="p-1 text-gray-400 hover:text-primary disabled:opacity-30 disabled:hover:text-gray-400 transition-colors"
                                                 title="Move Down"
                                             >
@@ -1209,34 +1210,55 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                         </div>
 
                                         <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-primary shrink-0 border border-blue-100">
-                                            <Layout className="w-5 h-5" />
+                                            {card.type === 'icon' ? <Layout className="w-5 h-5" /> : <ImageIcon className="w-5 h-5" />}
                                         </div>
 
-                                        <div className="flex-grow grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="flex-grow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                             <div className="flex flex-col gap-1">
-                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Icon Name (Lucide)</label>
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Card Type</label>
+                                                <select
+                                                    className="bg-transparent text-sm font-bold text-contrast focus:outline-none border-b border-transparent focus:border-gray-100 pb-1"
+                                                    value={card.type}
+                                                    onChange={(e) => {
+                                                        const newCards = [...(data.missionCards || [])];
+                                                        newCards[index].type = e.target.value as 'icon' | 'image';
+                                                        updateData({ missionCards: newCards });
+                                                    }}
+                                                >
+                                                    <option value="icon">Icon (Lucide)</option>
+                                                    <option value="image">Image URL</option>
+                                                </select>
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                                                    {card.type === 'icon' ? 'Icon Name' : 'Image URL'}
+                                                </label>
                                                 <input
                                                     className="bg-transparent text-sm font-mono text-contrast focus:outline-none border-b border-transparent focus:border-gray-100 pb-1"
-                                                    value={pillar.icon}
+                                                    value={card.type === 'icon' ? card.icon : card.imageUrl}
                                                     onChange={(e) => {
-                                                        const newPillars = [...(data.missionPillars || [])];
-                                                        newPillars[index].icon = e.target.value;
-                                                        updateData({ missionPillars: newPillars });
+                                                        const newCards = [...(data.missionCards || [])];
+                                                        if (card.type === 'icon') {
+                                                            newCards[index].icon = e.target.value;
+                                                        } else {
+                                                            newCards[index].imageUrl = e.target.value;
+                                                        }
+                                                        updateData({ missionCards: newCards });
                                                     }}
-                                                    placeholder="e.g. Plane, Wrench..."
+                                                    placeholder={card.type === 'icon' ? "e.g. Plane, Wrench..." : "https://..."}
                                                 />
                                             </div>
                                             <div className="flex flex-col gap-1">
                                                 <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Title</label>
                                                 <input
                                                     className="bg-transparent text-sm font-bold text-contrast focus:outline-none border-b border-transparent focus:border-gray-100 pb-1"
-                                                    value={pillar.title}
+                                                    value={card.title}
                                                     onChange={(e) => {
-                                                        const newPillars = [...(data.missionPillars || [])];
-                                                        newPillars[index].title = e.target.value;
-                                                        updateData({ missionPillars: newPillars });
+                                                        const newCards = [...(data.missionCards || [])];
+                                                        newCards[index].title = e.target.value;
+                                                        updateData({ missionCards: newCards });
                                                     }}
-                                                    placeholder="Pillar Title"
+                                                    placeholder="Card Title"
                                                 />
                                             </div>
                                             <div className="flex flex-col gap-1">
@@ -1244,29 +1266,29 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                                 <textarea
                                                     className="bg-transparent text-sm text-secondary focus:outline-none border-b border-transparent focus:border-gray-100 pb-1 resize-none"
                                                     rows={1}
-                                                    value={pillar.description}
+                                                    value={card.description}
                                                     onChange={(e) => {
-                                                        const newPillars = [...(data.missionPillars || [])];
-                                                        newPillars[index].description = e.target.value;
-                                                        updateData({ missionPillars: newPillars });
+                                                        const newCards = [...(data.missionCards || [])];
+                                                        newCards[index].description = e.target.value;
+                                                        updateData({ missionCards: newCards });
                                                     }}
                                                     placeholder="Description..."
                                                 />
                                             </div>
                                         </div>
 
-                                        <button onClick={() => handleDeleteMissionPillar(pillar.id)} className="text-red-400 hover:text-red-600 transition-colors p-2">
+                                        <button onClick={() => handleDeleteMissionCard(card.id)} className="text-red-400 hover:text-red-600 transition-colors p-2">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
                                 ))}
                             </div>
 
-                            {(!data.missionPillars || data.missionPillars.length === 0) && (
+                            {(!data.missionCards || data.missionCards.length === 0) && (
                                 <div className="text-center py-20 bg-white border border-dashed border-gray-200 rounded-3xl">
                                     <Layout className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                                    <h3 className="text-lg font-medium text-contrast">No mission pillars</h3>
-                                    <p className="text-secondary mt-2">Click "Add Pillar" to create dynamic mission sections.</p>
+                                    <h3 className="text-lg font-medium text-contrast">No mission cards</h3>
+                                    <p className="text-secondary mt-2">Click "Add Card" to create dynamic mission sections.</p>
                                 </div>
                             )}
                         </div>

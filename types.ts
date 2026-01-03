@@ -71,12 +71,13 @@ export interface TickerItem {
     type: 'wind' | 'zap' | 'users';
 }
 
-export interface MissionPillar {
+export interface MissionCard {
     id: string;
-    icon: string;
+    type: 'icon' | 'image';
+    icon?: string;
+    imageUrl?: string;
     title: string;
     description: string;
-    imageUrl?: string;
 }
 
 export interface ClubData {
@@ -86,7 +87,7 @@ export interface ClubData {
     siteContent: SiteContent;
     pillars: Pillar[];
     tickerItems: TickerItem[];
-    missionPillars: MissionPillar[];
+    missionCards: MissionCard[];
     googleCalendarUrl: string;
     discordUrl: string;
 }
