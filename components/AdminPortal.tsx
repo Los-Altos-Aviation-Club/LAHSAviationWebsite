@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ClubData, Project, Event } from '../types';
-import { LogOut, Plus, Trash2, ChevronLeft, Loader2, CheckCircle, AlertCircle, Image as ImageIcon, RefreshCw, Github, FolderPlus, Save, Send } from 'lucide-react';
+import { ClubData, Project, Meeting } from '../types';
+import { LogOut, Plus, Trash2, ChevronLeft, Loader2, CheckCircle, AlertCircle, Image as ImageIcon, RefreshCw, Github, FolderPlus, Send, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ARCHIVE_REPO, ARCHIVE_GITHUB_API_BASE_URL, PROJECTS_BASE_PATH } from '../constants';
 
@@ -17,12 +17,20 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-    const [activeTab, setActiveTab] = useState<'projects' | 'events' | 'settings'>('projects');
+    const [activeTab, setActiveTab] = useState<'projects' | 'meetings' | 'settings'>('projects');
     const [githubToken, setGithubToken] = useState<string>(() => localStorage.getItem('gh_pat') || '');
     const [initStatus, setInitStatus] = useState<Record<string, 'loading' | 'success' | 'error' | 'none'>>({});
     const [isBulkSyncing, setIsBulkSyncing] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [saveError, setSaveError] = useState('');
+
+    // Recurring Scheduler State
+    const [recurringType, setRecurringType] = useState<'Daily' | 'Weekly' | 'Monthly'>('Weekly');
+    const [recurringCount, setRecurringCount] = useState(4);
+    const [recurringTitle, setRecurringTitle] = useState('General Meeting');
+    const [recurringLocation, setRecurringLocation] = useState('Room 702');
+    const [recurringTime, setRecurringTime] = useState('15:30');
+    const [recurringStartDate, setRecurringStartDate] = useState(new Date().toISOString().split('T')[0]);
 
     const slugify = (text: string) => {
         return text
@@ -252,20 +260,52 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
         updateData({ projects: [...data.projects, newProject] });
     };
 
-    const handleDeleteEvent = (id: string) => {
-        updateData({ events: data.events.filter(e => e.id !== id) });
+    const handleDeleteMeeting = (id: string) => {
+        updateData({ meetings: data.meetings.filter(m => m.id !== id) });
     };
 
-    const handleAddEvent = () => {
-        const newEvent: Event = {
+    const handleAddMeeting = () => {
+        const newMeeting: Meeting = {
             id: Date.now().toString(),
-            title: 'New Event',
+            title: 'New Meeting',
             date: new Date().toISOString().split('T')[0],
-            time: '12:00',
-            location: 'TBD',
-            description: 'Event details here.'
+            time: '15:30',
+            location: 'Room 702',
+            description: 'Meeting details here.',
+            status: 'Active'
         };
-        updateData({ events: [...data.events, newEvent] });
+        updateData({ meetings: [...data.meetings, newMeeting] });
+    };
+
+    const handleCreateRecurring = () => {
+        const newMeetings: Meeting[] = [];
+        let currentDate = new Date(recurringStartDate);
+
+        // Adjust for timezone to ensure the date matches the input
+        currentDate.setMinutes(currentDate.getMinutes() + currentDate.getTimezoneOffset());
+
+        for (let i = 0; i < recurringCount; i++) {
+            newMeetings.push({
+                id: `${Date.now()}-${i}`,
+                title: recurringTitle,
+                date: currentDate.toISOString().split('T')[0],
+                time: recurringTime,
+                location: recurringLocation,
+                description: 'Recurring flight operation.',
+                status: 'Active'
+            });
+
+            if (recurringType === 'Daily') {
+                currentDate.setDate(currentDate.getDate() + 1);
+            } else if (recurringType === 'Weekly') {
+                currentDate.setDate(currentDate.getDate() + 7);
+            } else if (recurringType === 'Monthly') {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+            }
+        }
+
+        updateData({ meetings: [...data.meetings, ...newMeetings] });
+        alert(`Successfully scheduled ${recurringCount} meetings.`);
     };
 
     // Login Screen
@@ -279,11 +319,15 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                     </div>
                     <form onSubmit={handleLogin} className="space-y-6">
                         <div className="space-y-2">
+                            <label htmlFor="admin-password" id="password-label" className="sr-only">Password</label>
                             <input
+                                id="admin-password"
+                                name="admin-password"
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Password"
+                                aria-labelledby="password-label"
                                 disabled={isLoading || isSuccess}
                                 className={`w-full bg-surface border rounded-lg px-4 py-3 text-contrast placeholder-gray-400 focus:outline-none focus:ring-2 transition-all text-center ${error ? 'border-red-300 focus:ring-red-100' : 'border-gray-200 focus:ring-primary/50'
                                     } ${isSuccess ? 'border-green-300 bg-green-50 text-green-700' : ''}`}
@@ -421,7 +465,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
 
                 {/* Tabs */}
                 <div className="flex border-b border-gray-200 mb-8 space-x-8 overflow-x-auto">
-                    {(['projects', 'events', 'settings'] as const).map(tab => (
+                    {(['projects', 'meetings', 'settings'] as const).map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
@@ -467,17 +511,22 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                     </div>
                                     <div className="flex-grow space-y-4">
                                         <div className="flex justify-between items-start gap-4">
-                                            <textarea
-                                                className="w-full bg-transparent text-xl font-medium text-contrast placeholder-gray-300 focus:outline-none resize-none"
-                                                rows={1}
-                                                value={project.title}
-                                                onChange={(e) => {
-                                                    const newProjects = [...data.projects];
-                                                    newProjects[index].title = e.target.value;
-                                                    updateData({ projects: newProjects });
-                                                }}
-                                                placeholder="Project Title"
-                                            />
+                                            <div className="w-full">
+                                                <label htmlFor={`project-title-${project.id}`} className="sr-only">Project Title</label>
+                                                <textarea
+                                                    id={`project-title-${project.id}`}
+                                                    name={`project-title-${project.id}`}
+                                                    className="w-full bg-transparent text-xl font-medium text-contrast placeholder-gray-300 focus:outline-none resize-none"
+                                                    rows={1}
+                                                    value={project.title}
+                                                    onChange={(e) => {
+                                                        const newProjects = [...data.projects];
+                                                        newProjects[index].title = e.target.value;
+                                                        updateData({ projects: newProjects });
+                                                    }}
+                                                    placeholder="Project Title"
+                                                />
+                                            </div>
                                             <div className="text-[10px] font-mono text-gray-400 bg-gray-50 px-2 py-1 rounded border border-gray-100 whitespace-nowrap">
                                                 ID: {slugify(project.title)}
                                             </div>
@@ -485,8 +534,10 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
 
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="flex flex-col gap-1">
-                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Lead Engineer</label>
+                                                <label htmlFor={`project-lead-${project.id}`} className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Lead Engineer</label>
                                                 <input
+                                                    id={`project-lead-${project.id}`}
+                                                    name={`project-lead-${project.id}`}
                                                     className="w-full bg-transparent text-sm text-secondary focus:outline-none border-b border-gray-100 pb-1"
                                                     value={project.leadEngineer || ''}
                                                     onChange={(e) => {
@@ -498,8 +549,10 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                                 />
                                             </div>
                                             <div className="flex flex-col gap-1">
-                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Est. Completion</label>
+                                                <label htmlFor={`project-completion-${project.id}`} className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Est. Completion</label>
                                                 <input
+                                                    id={`project-completion-${project.id}`}
+                                                    name={`project-completion-${project.id}`}
                                                     className="w-full bg-transparent text-sm text-secondary focus:outline-none border-b border-gray-100 pb-1"
                                                     value={project.estCompletion || ''}
                                                     onChange={(e) => {
@@ -513,8 +566,11 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                         </div>
 
                                         <div className="flex items-center gap-2 text-sm text-gray-400 bg-gray-50 p-2 rounded-lg">
-                                            <ImageIcon className="w-4 h-4 shrink-0" />
+                                            <label htmlFor={`project-image-${project.id}`} className="sr-only">Image URL</label>
+                                            <ImageIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
                                             <input
+                                                id={`project-image-${project.id}`}
+                                                name={`project-image-${project.id}`}
                                                 className="w-full bg-transparent text-xs text-secondary focus:outline-none"
                                                 value={project.imageUrl || ''}
                                                 onChange={(e) => {
@@ -525,16 +581,21 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                                 placeholder="Image URL (https://...)"
                                             />
                                         </div>
-                                        <textarea
-                                            className="w-full bg-transparent text-secondary text-sm focus:outline-none resize-y min-h-[5rem]"
-                                            value={project.description}
-                                            onChange={(e) => {
-                                                const newProjects = [...data.projects];
-                                                newProjects[index].description = e.target.value;
-                                                updateData({ projects: newProjects });
-                                            }}
-                                            placeholder="Description"
-                                        />
+                                        <div className="flex flex-col">
+                                            <label htmlFor={`project-desc-${project.id}`} className="sr-only">Description</label>
+                                            <textarea
+                                                id={`project-desc-${project.id}`}
+                                                name={`project-desc-${project.id}`}
+                                                className="w-full bg-transparent text-secondary text-sm focus:outline-none resize-y min-h-[5rem]"
+                                                value={project.description}
+                                                onChange={(e) => {
+                                                    const newProjects = [...data.projects];
+                                                    newProjects[index].description = e.target.value;
+                                                    updateData({ projects: newProjects });
+                                                }}
+                                                placeholder="Description"
+                                            />
+                                        </div>
                                         <div className="bg-blue-50/50 p-2 rounded-lg border border-blue-100/50">
                                             <p className="text-[10px] text-blue-700 font-medium flex items-center gap-1">
                                                 <Github className="w-3 h-3" /> PROJECT ARCHIVE PATH:
@@ -545,8 +606,10 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                         </div>
                                         <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-2 border-t border-gray-100">
                                             <div className="flex flex-col gap-1">
-                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Lifecycle Stage</label>
+                                                <label htmlFor={`project-status-${project.id}`} className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Lifecycle Stage</label>
                                                 <select
+                                                    id={`project-status-${project.id}`}
+                                                    name={`project-status-${project.id}`}
                                                     className="bg-transparent text-xs text-secondary focus:outline-none cursor-pointer font-medium"
                                                     value={project.status}
                                                     onChange={(e) => {
@@ -561,8 +624,10 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                                 </select>
                                             </div>
                                             <div className="flex flex-col gap-1">
-                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Operational Status</label>
+                                                <label htmlFor={`project-op-status-${project.id}`} className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Operational Status</label>
                                                 <select
+                                                    id={`project-op-status-${project.id}`}
+                                                    name={`project-op-status-${project.id}`}
                                                     className="bg-transparent text-xs text-secondary focus:outline-none cursor-pointer font-medium"
                                                     value={project.operationalStatus}
                                                     onChange={(e) => {
@@ -596,7 +661,10 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                             <div className="grid grid-cols-1 gap-2">
                                                 {(project.specs || []).map((spec, sIdx) => (
                                                     <div key={sIdx} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg group/spec">
+                                                        <label htmlFor={`project-${project.id}-spec-label-${sIdx}`} className="sr-only">Spec Label</label>
                                                         <input
+                                                            id={`project-${project.id}-spec-label-${sIdx}`}
+                                                            name={`project-${project.id}-spec-label-${sIdx}`}
                                                             className="w-1/3 bg-transparent text-[11px] font-bold text-contrast focus:outline-none"
                                                             value={spec.label}
                                                             onChange={(e) => {
@@ -607,7 +675,10 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                                             placeholder="Label"
                                                         />
                                                         <div className="w-[1px] h-3 bg-gray-200" />
+                                                        <label htmlFor={`project-${project.id}-spec-value-${sIdx}`} className="sr-only">Spec Value</label>
                                                         <input
+                                                            id={`project-${project.id}-spec-value-${sIdx}`}
+                                                            name={`project-${project.id}-spec-value-${sIdx}`}
                                                             className="flex-grow bg-transparent text-[11px] text-secondary focus:outline-none"
                                                             value={spec.value}
                                                             onChange={(e) => {
@@ -671,78 +742,219 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                         </div>
                     )}
 
-                    {/* Events */}
-                    {activeTab === 'events' && (
-                        <div className="space-y-6">
-                            <div className="flex justify-end">
-                                <button onClick={handleAddEvent} className="bg-white hover:bg-gray-50 text-contrast border border-gray-200 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm">
-                                    <Plus className="w-4 h-4" /> Add Event
-                                </button>
-                            </div>
-                            {data.events.map((event, index) => (
-                                <div key={event.id} className="bg-white border border-gray-200 p-6 rounded-2xl flex flex-col gap-4 shadow-sm">
-                                    <div className="flex justify-between items-start gap-4">
-                                        <textarea
-                                            className="bg-transparent text-lg font-medium text-contrast placeholder-gray-300 focus:outline-none w-full resize-none"
-                                            rows={1}
-                                            value={event.title}
-                                            onChange={(e) => {
-                                                const newEvents = [...data.events];
-                                                newEvents[index].title = e.target.value;
-                                                updateData({ events: newEvents });
-                                            }}
-                                            placeholder="Event Title"
-                                        />
-                                        <button onClick={() => handleDeleteEvent(event.id)} className="text-red-500 hover:text-red-700 transition-colors shrink-0">
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
+                    {/* Meetings */}
+                    {activeTab === 'meetings' && (
+                        <div className="space-y-12">
+                            {/* Recurring Scheduler */}
+                            <div className="bg-white border-2 border-primary/20 p-8 rounded-3xl shadow-sm space-y-6">
+                                <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
+                                    <Calendar className="w-6 h-6 text-primary" />
+                                    <div>
+                                        <h2 className="text-xl font-bold text-contrast">Recurring Scheduler</h2>
+                                        <p className="text-xs text-secondary">Bulk generate meeting entries</p>
                                     </div>
+                                </div>
 
-                                    <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Meeting Title</label>
+                                        <input
+                                            className="w-full bg-surface border border-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                            value={recurringTitle}
+                                            onChange={(e) => setRecurringTitle(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Frequency</label>
+                                        <select
+                                            className="w-full bg-surface border border-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none"
+                                            value={recurringType}
+                                            onChange={(e) => setRecurringType(e.target.value as any)}
+                                        >
+                                            <option value="Daily">Daily</option>
+                                            <option value="Weekly">Weekly</option>
+                                            <option value="Monthly">Monthly</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Occurrences</label>
+                                        <input
+                                            type="number"
+                                            className="w-full bg-surface border border-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none"
+                                            value={recurringCount}
+                                            onChange={(e) => setRecurringCount(parseInt(e.target.value) || 1)}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Start Date</label>
                                         <input
                                             type="date"
-                                            className="bg-gray-50 rounded px-3 py-2 text-sm text-secondary focus:outline-none"
-                                            value={event.date}
-                                            onChange={(e) => {
-                                                const newEvents = [...data.events];
-                                                newEvents[index].date = e.target.value;
-                                                updateData({ events: newEvents });
-                                            }}
-                                        />
-                                        <input
-                                            type="time"
-                                            className="bg-gray-50 rounded px-3 py-2 text-sm text-secondary focus:outline-none"
-                                            value={event.time}
-                                            onChange={(e) => {
-                                                const newEvents = [...data.events];
-                                                newEvents[index].time = e.target.value;
-                                                updateData({ events: newEvents });
-                                            }}
+                                            className="w-full bg-surface border border-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none"
+                                            value={recurringStartDate}
+                                            onChange={(e) => setRecurringStartDate(e.target.value)}
                                         />
                                     </div>
-
-                                    <input
-                                        className="bg-transparent text-sm text-secondary focus:outline-none border-b border-gray-100 pb-2"
-                                        value={event.location}
-                                        onChange={(e) => {
-                                            const newEvents = [...data.events];
-                                            newEvents[index].location = e.target.value;
-                                            updateData({ events: newEvents });
-                                        }}
-                                        placeholder="Location"
-                                    />
-                                    <textarea
-                                        className="bg-transparent text-sm text-secondary focus:outline-none resize-y min-h-[3rem]"
-                                        value={event.description}
-                                        onChange={(e) => {
-                                            const newEvents = [...data.events];
-                                            newEvents[index].description = e.target.value;
-                                            updateData({ events: newEvents });
-                                        }}
-                                        placeholder="Brief Description"
-                                    />
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Time</label>
+                                        <input
+                                            type="time"
+                                            className="w-full bg-surface border border-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none"
+                                            value={recurringTime}
+                                            onChange={(e) => setRecurringTime(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Location</label>
+                                        <input
+                                            className="w-full bg-surface border border-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none"
+                                            value={recurringLocation}
+                                            onChange={(e) => setRecurringLocation(e.target.value)}
+                                        />
+                                    </div>
                                 </div>
-                            ))}
+
+                                <button
+                                    onClick={handleCreateRecurring}
+                                    className="w-full py-3 bg-primary text-white rounded-xl font-bold text-sm hover:bg-blue-600 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                                >
+                                    <Plus className="w-4 h-4" /> Generate {recurringCount} {recurringType} Meetings
+                                </button>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="text-sm font-bold text-secondary uppercase tracking-widest">Individual Meetings</h3>
+                                    <button onClick={handleAddMeeting} className="bg-white hover:bg-gray-50 text-contrast border border-gray-200 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm">
+                                        <Plus className="w-4 h-4" /> Add Meeting
+                                    </button>
+                                </div>
+                                {data.meetings.map((meeting, index) => (
+                                    <div key={meeting.id} className={`bg-white border border-gray-200 p-6 rounded-2xl flex flex-col gap-4 shadow-sm transition-all ${meeting.status === 'Cancelled' ? 'border-red-200 bg-red-50/10' : ''}`}>
+                                        <div className="flex justify-between items-start gap-4">
+                                            <div className="w-full">
+                                                <label htmlFor={`meeting-title-${meeting.id}`} className="sr-only">Meeting Title</label>
+                                                <textarea
+                                                    id={`meeting-title-${meeting.id}`}
+                                                    name={`meeting-title-${meeting.id}`}
+                                                    className="bg-transparent text-lg font-medium text-contrast placeholder-gray-300 focus:outline-none w-full resize-none"
+                                                    rows={1}
+                                                    value={meeting.title}
+                                                    onChange={(e) => {
+                                                        const newMeetings = [...data.meetings];
+                                                        newMeetings[index].title = e.target.value;
+                                                        updateData({ meetings: newMeetings });
+                                                    }}
+                                                    placeholder="Meeting Title"
+                                                />
+                                            </div>
+                                            <button onClick={() => handleDeleteMeeting(meeting.id)} className="text-red-500 hover:text-red-700 transition-colors shrink-0">
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Date</label>
+                                                <input
+                                                    type="date"
+                                                    className="bg-gray-50 rounded px-3 py-2 text-sm text-secondary focus:outline-none"
+                                                    value={meeting.date}
+                                                    onChange={(e) => {
+                                                        const newMeetings = [...data.meetings];
+                                                        newMeetings[index].date = e.target.value;
+                                                        updateData({ meetings: newMeetings });
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Time</label>
+                                                <input
+                                                    type="time"
+                                                    className="bg-gray-50 rounded px-3 py-2 text-sm text-secondary focus:outline-none"
+                                                    value={meeting.time}
+                                                    onChange={(e) => {
+                                                        const newMeetings = [...data.meetings];
+                                                        newMeetings[index].time = e.target.value;
+                                                        updateData({ meetings: newMeetings });
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Status</label>
+                                                <select
+                                                    className={`rounded px-3 py-2 text-sm font-bold focus:outline-none ${meeting.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}
+                                                    value={meeting.status}
+                                                    onChange={(e) => {
+                                                        const newMeetings = [...data.meetings];
+                                                        newMeetings[index].status = e.target.value as any;
+                                                        updateData({ meetings: newMeetings });
+                                                    }}
+                                                >
+                                                    <option value="Active">Active</option>
+                                                    <option value="Cancelled">Cancelled</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Location</label>
+                                            <input
+                                                className="bg-transparent text-sm text-secondary focus:outline-none border-b border-gray-100 pb-2"
+                                                value={meeting.location}
+                                                onChange={(e) => {
+                                                    const newMeetings = [...data.meetings];
+                                                    newMeetings[index].location = e.target.value;
+                                                    updateData({ meetings: newMeetings });
+                                                }}
+                                                placeholder="Location"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Description</label>
+                                            <textarea
+                                                className="bg-transparent text-sm text-secondary focus:outline-none resize-y min-h-[3rem]"
+                                                value={meeting.description}
+                                                onChange={(e) => {
+                                                    const newMeetings = [...data.meetings];
+                                                    newMeetings[index].description = e.target.value;
+                                                    updateData({ meetings: newMeetings });
+                                                }}
+                                                placeholder="Brief Description"
+                                            />
+                                        </div>
+
+                                        {meeting.status === 'Cancelled' && (
+                                            <div className="flex flex-col gap-1 p-3 bg-red-50 rounded-lg border border-red-100">
+                                                <label className="text-[10px] font-bold uppercase tracking-wider text-red-600">Cancellation Reason</label>
+                                                <input
+                                                    className="bg-transparent text-sm text-red-800 focus:outline-none placeholder-red-300"
+                                                    value={meeting.cancellationReason || ''}
+                                                    onChange={(e) => {
+                                                        const newMeetings = [...data.meetings];
+                                                        newMeetings[index].cancellationReason = e.target.value;
+                                                        updateData({ meetings: newMeetings });
+                                                    }}
+                                                    placeholder="e.g. Inclement weather, school closure..."
+                                                />
+                                            </div>
+                                        )}
+
+                                        <div className="flex items-center gap-2 text-sm text-gray-400 bg-gray-50 p-2 rounded-lg">
+                                            <ImageIcon className="w-4 h-4 shrink-0" />
+                                            <input
+                                                className="w-full bg-transparent text-xs text-secondary focus:outline-none"
+                                                value={meeting.imageUrl || ''}
+                                                onChange={(e) => {
+                                                    const newMeetings = [...data.meetings];
+                                                    newMeetings[index].imageUrl = e.target.value;
+                                                    updateData({ meetings: newMeetings });
+                                                }}
+                                                placeholder="Image URL (optional)"
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
 
@@ -750,16 +962,20 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                     {activeTab === 'settings' && (
                         <div className="max-w-xl space-y-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-medium text-secondary uppercase tracking-wide">Google Calendar URL</label>
+                                <label htmlFor="settings-calendar-url" className="text-xs font-medium text-secondary uppercase tracking-wide">Google Calendar URL</label>
                                 <input
+                                    id="settings-calendar-url"
+                                    name="settings-calendar-url"
                                     className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm text-contrast focus:outline-none focus:border-primary transition-colors shadow-sm"
                                     value={data.googleCalendarUrl}
                                     onChange={(e) => updateData({ googleCalendarUrl: e.target.value })}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-medium text-secondary uppercase tracking-wide">Discord Invite URL</label>
+                                <label htmlFor="settings-discord-url" className="text-xs font-medium text-secondary uppercase tracking-wide">Discord Invite URL</label>
                                 <input
+                                    id="settings-discord-url"
+                                    name="settings-discord-url"
                                     className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm text-contrast focus:outline-none focus:border-primary transition-colors shadow-sm"
                                     value={data.discordUrl}
                                     onChange={(e) => updateData({ discordUrl: e.target.value })}
@@ -804,22 +1020,27 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                     <p className="text-xs text-secondary">
                                         Enter a GitHub Personal Access Token (PAT) with <code>repo</code> permissions to enable "Self-Healing" folder creation. This token is stored only in your browser's <code>localStorage</code>.
                                     </p>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="password"
-                                            className="flex-grow bg-white border border-gray-200 rounded-lg p-3 text-sm text-contrast focus:outline-none focus:border-primary transition-colors shadow-sm"
-                                            value={githubToken}
-                                            onChange={(e) => handleTokenChange(e.target.value)}
-                                            placeholder="ghp_xxxxxxxxxxxx"
-                                        />
-                                        {githubToken && (
-                                            <button
-                                                onClick={() => handleTokenChange('')}
-                                                className="px-4 py-2 text-xs text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                            >
-                                                Clear
-                                            </button>
-                                        )}
+                                    <div className="flex flex-col gap-2">
+                                        <label htmlFor="settings-github-token" className="sr-only">GitHub PAT</label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                id="settings-github-token"
+                                                name="settings-github-token"
+                                                type="password"
+                                                className="flex-grow bg-white border border-gray-200 rounded-lg p-3 text-sm text-contrast focus:outline-none focus:border-primary transition-colors shadow-sm"
+                                                value={githubToken}
+                                                onChange={(e) => handleTokenChange(e.target.value)}
+                                                placeholder="ghp_xxxxxxxxxxxx"
+                                            />
+                                            {githubToken && (
+                                                <button
+                                                    onClick={() => handleTokenChange('')}
+                                                    className="px-4 py-2 text-xs text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                >
+                                                    Clear
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

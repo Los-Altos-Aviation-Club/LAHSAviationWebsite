@@ -29,7 +29,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAdmin, isGameMode = false }) => {
         { name: 'Overview', path: '/' },
         { name: 'Our Mission', path: '/mission' },
         { name: 'Projects', path: '/projects' },
-        { name: 'Events', path: '/events' },
+        { name: 'Meetings', path: '/events' },
         { name: 'Contact', path: '/contact' },
     ];
 

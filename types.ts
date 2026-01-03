@@ -24,13 +24,15 @@ export interface Officer {
     email: string;
 }
 
-export interface Event {
+export interface Meeting {
     id: string;
     title: string;
     date: string;
     time: string;
     location: string;
     description: string;
+    status: 'Active' | 'Cancelled';
+    cancellationReason?: string;
     imageUrl?: string;
 }
 
@@ -59,7 +61,7 @@ export interface TickerItem {
 export interface ClubData {
     projects: Project[];
     officers: Officer[];
-    events: Event[];
+    meetings: Meeting[];
     siteContent: SiteContent;
     pillars: Pillar[];
     tickerItems: TickerItem[];
