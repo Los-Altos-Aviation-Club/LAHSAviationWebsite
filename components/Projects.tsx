@@ -217,7 +217,7 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdateProject }) =
 
                                                 {/* Specs Grid */}
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    {selectedProject?.specs?.map((spec, idx) => (
+                                                    {(selectedProject?.specs || []).map((spec, idx) => (
                                                         <div key={idx} className="bg-surface p-6 rounded-2xl border border-gray-100">
                                                             <div className="text-xs font-mono text-gray-400 uppercase mb-1">
                                                                 <EditableText

@@ -146,20 +146,28 @@ const MainContent: React.FC = () => {
                     const remoteData = await response.json();
 
                     // Deep merge remote data with initial data to prevent missing field crashes
-                    setData(prev => ({
-                        ...prev,
-                        ...remoteData,
-                        siteContent: {
-                            ...prev.siteContent,
-                            ...(remoteData.siteContent || {})
-                        },
-                        // Ensure arrays exist if remote data is partial
-                        projects: remoteData.projects || prev.projects,
-                        officers: remoteData.officers || prev.officers,
-                        events: remoteData.events || prev.events,
-                        pillars: remoteData.pillars || prev.pillars,
-                        tickerItems: remoteData.tickerItems || prev.tickerItems
-                    }));
+                    setData(prev => {
+                        const mergedProjects = (remoteData.projects || prev.projects).map((p: Project) => ({
+                            ...p,
+                            specs: p.specs || [],
+                            operationalStatus: p.operationalStatus || 'Active'
+                        }));
+
+                        return {
+                            ...prev,
+                            ...remoteData,
+                            siteContent: {
+                                ...prev.siteContent,
+                                ...(remoteData.siteContent || {})
+                            },
+                            // Ensure arrays exist if remote data is partial
+                            projects: mergedProjects,
+                            officers: remoteData.officers || prev.officers,
+                            events: remoteData.events || prev.events,
+                            pillars: remoteData.pillars || prev.pillars,
+                            tickerItems: remoteData.tickerItems || prev.tickerItems
+                        };
+                    });
 
                     setIsArchiveLoaded(true);
                     console.log('Loaded data from Archive Repository');

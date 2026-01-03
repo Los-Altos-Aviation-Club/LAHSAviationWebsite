@@ -563,7 +563,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                                 </button>
                                             </div>
                                             <div className="grid grid-cols-1 gap-2">
-                                                {project.specs.map((spec, sIdx) => (
+                                                {(project.specs || []).map((spec, sIdx) => (
                                                     <div key={sIdx} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg group/spec">
                                                         <input
                                                             className="w-1/3 bg-transparent text-[11px] font-bold text-contrast focus:outline-none"
