@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ClubData, SiteContent, TickerItem } from '../types';
-import { ArrowRight, Wind, Zap, Users, Plane, Wrench, Navigation, Layout } from 'lucide-react';
+import { ArrowRight, Wind, Zap, Users } from 'lucide-react';
 import EditableText from './EditableText';
 
 interface HomeProps {
@@ -98,44 +98,6 @@ const Home: React.FC<HomeProps> = ({ data, isAdmin, onUpdate, onUpdateTicker, se
                         <Link to="/mission" className="px-8 py-3.5 bg-white text-contrast border border-gray-200 font-medium rounded-full hover:bg-gray-50 transition-colors flex items-center gap-2">
                             Our Mission
                         </Link>
-                    </div>
-                </div>
-            </section>
-
-            {/* STATIC FEATURE BOXES SECTION */}
-            <section className="py-24 bg-white relative z-20">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                        {/* Static Box 1 */}
-                        <div className="flex flex-col items-center text-center group">
-                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <Plane className="w-8 h-8 text-primary" />
-                            </div>
-                            <h3 className="text-2xl font-bold mb-4 text-contrast">Design</h3>
-                            <p className="text-secondary leading-relaxed">
-                                Learn the principles of aeronautics and use CAD software to design your own airframes and systems.
-                            </p>
-                        </div>
-                        {/* Static Box 2 */}
-                        <div className="flex flex-col items-center text-center group">
-                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <Wrench className="w-8 h-8 text-primary" />
-                            </div>
-                            <h3 className="text-2xl font-bold mb-4 text-contrast">Build</h3>
-                            <p className="text-secondary leading-relaxed">
-                                Get hands-on experience with composite materials, electronics, and precision mechanical assembly.
-                            </p>
-                        </div>
-                        {/* Static Box 3 */}
-                        <div className="flex flex-col items-center text-center group">
-                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <Navigation className="w-8 h-8 text-primary" />
-                            </div>
-                            <h3 className="text-2xl font-bold mb-4 text-contrast">Fly</h3>
-                            <p className="text-secondary leading-relaxed">
-                                Take your creations to the skies and analyze real-time flight data to improve performance.
-                            </p>
-                        </div>
                     </div>
                 </div>
             </section>

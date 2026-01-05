@@ -19,7 +19,7 @@ Follow these steps to run the project locally:
     ```
 
 3.  **Access the Application**
-    Navigate to [http://localhost:3000](http://localhost:3000) in your web browser.
+    Navigate to [https://localhost:3000](https://localhost:3000) in your web browser.
 
 ## Architecture Summary
 

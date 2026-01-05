@@ -206,6 +206,40 @@ const ScrollToTop = () => {
     return null;
 };
 
+// --- Helper: Secure HTTPS Upgrade ---
+const secureUrl = (url: string): string => {
+    if (typeof url !== 'string') return url;
+    return url.replace(/^http:\/\//i, 'https://');
+};
+
+const sanitizeClubData = (data: ClubData): ClubData => {
+    return {
+        ...data,
+        projects: (data.projects || []).map(p => ({
+            ...p,
+            imageUrl: secureUrl(p.imageUrl)
+        })),
+        officers: (data.officers || []).map(o => ({
+            ...o,
+            imageUrl: secureUrl(o.imageUrl)
+        })),
+        meetings: (data.meetings || []).map(m => ({
+            ...m,
+            imageUrl: secureUrl(m.imageUrl)
+        })),
+        pillars: (data.pillars || []).map(p => ({
+            ...p,
+            imageUrl: secureUrl(p.imageUrl)
+        })),
+        missionCards: (data.missionCards || []).map(c => ({
+            ...c,
+            imageUrl: secureUrl(c.imageUrl || '')
+        })),
+        googleCalendarUrl: secureUrl(data.googleCalendarUrl || ''),
+        discordUrl: secureUrl(data.discordUrl || '')
+    };
+};
+
 // --- Main Content Wrapper ---
 const MainContent: React.FC = () => {
     const [data, setData] = useState<ClubData>(INITIAL_DATA);
@@ -243,10 +277,11 @@ const MainContent: React.FC = () => {
                 const response = await fetch(`${ARCHIVE_RAW_BASE_URL}/metadata.json`);
                 if (response.ok) {
                     const remoteData = await response.json();
+                    const sanitizedRemoteData = sanitizeClubData(remoteData);
 
-                    const remoteTimestamp = remoteData.lastUpdated ? new Date(remoteData.lastUpdated).getTime() : 0;
+                    const remoteTimestamp = sanitizedRemoteData.lastUpdated ? new Date(sanitizedRemoteData.lastUpdated).getTime() : 0;
 
-                    const finalData = (localData && localTimestamp > remoteTimestamp) ? localData : remoteData;
+                    const finalData = (localData && localTimestamp > remoteTimestamp) ? localData : sanitizedRemoteData;
 
                     // Auto-pruning logic: Filter out meetings older than current date
                     const today = new Date();

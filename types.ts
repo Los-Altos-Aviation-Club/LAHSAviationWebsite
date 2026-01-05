@@ -90,4 +90,5 @@ export interface ClubData {
     missionCards: MissionCard[];
     googleCalendarUrl: string;
     discordUrl: string;
+    lastUpdated?: string;
 }
