@@ -12,7 +12,6 @@ export interface Project {
     operationalStatus: 'Active' | 'On Hold' | 'Abandoned' | 'Completed';
     imageUrl?: string;
     specs: Spec[];
-    leadEngineer?: string;
     estCompletion?: string;
     completionDate?: string; // Add this to match AdminPortal.tsx usage
 }

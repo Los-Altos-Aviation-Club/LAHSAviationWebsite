@@ -654,22 +654,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="flex flex-col gap-1">
-                                                <label htmlFor={`project-lead-${project.id}`} className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Lead Engineer</label>
-                                                <input
-                                                    id={`project-lead-${project.id}`}
-                                                    name={`project-lead-${project.id}`}
-                                                    className="w-full bg-transparent text-sm text-secondary focus:outline-none border-b border-gray-100 pb-1"
-                                                    value={project.leadEngineer || ''}
-                                                    onChange={(e) => {
-                                                        const newProjects = [...data.projects];
-                                                        newProjects[index].leadEngineer = e.target.value;
-                                                        updateData({ projects: newProjects });
-                                                    }}
-                                                    placeholder="Name"
-                                                />
-                                            </div>
+                                        <div className="grid grid-cols-1 gap-4">
                                             <div className="flex flex-col gap-1">
                                                 <label htmlFor={`project-completion-${project.id}`} className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Est. Completion</label>
                                                 <input

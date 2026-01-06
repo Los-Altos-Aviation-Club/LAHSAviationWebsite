@@ -499,28 +499,15 @@ const Projects: React.FC<ProjectsProps> = ({ data, isAdmin, onUpdate, onUpdatePr
                                 </p>
 
                                 <div className="pt-4 border-t border-gray-100">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-1">
-                                            <p className="text-xs font-mono text-gray-400 uppercase">Lead Engineer</p>
-                                            <div className="text-sm font-medium">
-                                                <EditableText
-                                                    value={project.leadEngineer || 'TBD'}
-                                                    onSave={(val) => onUpdateProject(project.id, 'leadEngineer', val)}
-                                                    isAdmin={isAdmin}
-                                                    label="Lead Engineer"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-xs font-mono text-gray-400 uppercase">Est. Completion</p>
-                                            <div className="text-sm font-medium">
-                                                <EditableText
-                                                    value={project.estCompletion || 'TBD'}
-                                                    onSave={(val) => onUpdateProject(project.id, 'estCompletion', val)}
-                                                    isAdmin={isAdmin}
-                                                    label="Completion Date"
-                                                />
-                                            </div>
+                                    <div className="flex flex-col gap-1">
+                                        <p className="text-xs font-mono text-gray-400 uppercase">Est. Completion</p>
+                                        <div className="text-sm font-medium">
+                                            <EditableText
+                                                value={project.estCompletion || 'TBD'}
+                                                onSave={(val) => onUpdateProject(project.id, 'estCompletion', val)}
+                                                isAdmin={isAdmin}
+                                                label="Completion Date"
+                                            />
                                         </div>
                                     </div>
                                 </div>

@@ -27,7 +27,6 @@ const INITIAL_DATA: ClubData = {
                 { label: 'Motor', value: 'L-Class' },
                 { label: 'Recovery', value: 'Dual Deploy' }
             ],
-            leadEngineer: 'Aiden Chen',
             estCompletion: 'June 2025'
         },
         {
@@ -42,7 +41,6 @@ const INITIAL_DATA: ClubData = {
                 { label: 'Battery', value: '6S 10Ah' },
                 { label: 'Range', value: '15km' }
             ],
-            leadEngineer: 'Maya Rodriguez',
             estCompletion: 'March 2025'
         },
         {
@@ -57,7 +55,6 @@ const INITIAL_DATA: ClubData = {
                 { label: 'Flight Time', value: '45min' },
                 { label: 'Controller', value: 'ArduPilot' }
             ],
-            leadEngineer: 'Liam Smith',
             estCompletion: 'Sept 2025'
         }
     ],
@@ -182,7 +179,7 @@ const INITIAL_DATA: ClubData = {
         missionStatement: 'Bridging the gap between theoretical physics and real-world aerospace engineering through hands-on fabrication and flight testing.',
         missionTeamTitle: 'Meet the Team',
         missionTeamSubtitle: 'The pilots, engineers, and dreamers behind the projects.',
-        meetingsTitle: 'Upcoming Departures',
+        meetingsTitle: 'Upcoming Meetings',
         meetingsSubtitle: 'Workshops, launches, and guest speakers.',
         projectsTitle: 'Active Development',
         projectsSubtitle: 'Current engineering efforts in rocketry, fixed-wing aircraft, and multi-rotor systems.',

@@ -16,19 +16,10 @@ const Contact: React.FC<ContactProps> = ({ data, isAdmin, onUpdate, onUpdateOffi
     return (
         <div className="min-h-screen pt-32 pb-20 bg-white text-contrast relative overflow-hidden">
 
-            {/* Radar Animation Background (Blue Rings) */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                <div className="w-[800px] h-[800px] border border-primary/20 rounded-full animate-ping [animation-duration:3s]"></div>
-                <div className="absolute w-[600px] h-[600px] border border-primary/30 rounded-full animate-ping [animation-duration:3s] [animation-delay:1s]"></div>
-                <div className="absolute w-[400px] h-[400px] border border-primary/40 rounded-full animate-ping [animation-duration:3s] [animation-delay:2s]"></div>
-                {/* Center Point */}
-                <div className="absolute w-4 h-4 bg-primary/20 rounded-full blur-sm"></div>
-            </div>
-
             <div className="max-w-4xl mx-auto px-6 relative z-10 w-full">
                 <div className="text-center space-y-8 mb-16">
                     <div className="inline-block px-3 py-1 rounded-full border border-primary/20 bg-blue-50 text-xs font-mono tracking-widest text-primary uppercase">
-                        Comm Channel: Open
+                        Communications: Open
                     </div>
                     <div className="text-6xl md:text-7xl font-bold tracking-tight">
                         <EditableText
@@ -159,7 +150,7 @@ const Contact: React.FC<ContactProps> = ({ data, isAdmin, onUpdate, onUpdateOffi
 
                 <div className="mt-16 text-center">
                     <p className="text-gray-400 font-mono text-xs uppercase tracking-widest">
-                        Los Altos High School &middot; 201 Almond Ave, Los Altos, CA 94022
+                        Los Altos High School &bull; 201 Almond Ave, Los Altos, CA 94022
                     </p>
                 </div>
             </div>
