@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ClubData, Project, Meeting, Officer, MissionCard } from '../types';
 import { LogOut, Plus, Trash2, ChevronLeft, Loader2, CheckCircle, AlertCircle, Image as ImageIcon, RefreshCw, Github, FolderPlus, Send, Calendar, CloudSync, Users, ArrowUp, ArrowDown, Layout } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ARCHIVE_REPO, ARCHIVE_GITHUB_API_BASE_URL, PROJECTS_BASE_PATH } from '../constants';
+import { ARCHIVE_REPO, ARCHIVE_GITHUB_API_BASE_URL, MAIN_REPO, MAIN_GITHUB_API_BASE_URL, PROJECTS_BASE_PATH } from '../constants';
 
 interface AdminPortalProps {
     data: ClubData;
@@ -97,9 +97,9 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                 'Content-Type': 'application/json',
             };
 
-            // 1. Get the current SHA of metadata.json from ARCHIVE
-            const getRes = await fetch(`${ARCHIVE_GITHUB_API_BASE_URL}/metadata.json`, { headers });
-            if (!getRes.ok) throw new Error('Failed to fetch metadata.json from Archive Repository');
+            // 1. Get the current SHA of metadata.json from MAIN
+            const getRes = await fetch(`${MAIN_GITHUB_API_BASE_URL}/metadata.json`, { headers });
+            if (!getRes.ok) throw new Error('Failed to fetch metadata.json from Main Repository');
             const fileData = await getRes.json();
             const currentSha = fileData.sha;
 
@@ -118,8 +118,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                 throw new Error('Failed to encode data for GitHub. This might be due to unsupported special characters.');
             }
 
-            // 3. Update the file in ARCHIVE
-            const updateRes = await fetch(`${ARCHIVE_GITHUB_API_BASE_URL}/metadata.json`, {
+            // 3. Update the file in MAIN
+            const updateRes = await fetch(`${MAIN_GITHUB_API_BASE_URL}/metadata.json`, {
                 method: 'PUT',
                 headers,
                 body: JSON.stringify({
@@ -518,7 +518,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                             </div>
 
                             <a
-                                href={`https://github.com/${ARCHIVE_REPO}`}
+                                href={`https://github.com/${MAIN_REPO}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-1.5 px-2.5 py-1 bg-white border border-gray-100 rounded-full shadow-sm text-secondary hover:text-primary transition-colors group"
@@ -560,7 +560,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                     <div className="flex gap-2 items-start">
                         <div className="font-bold shrink-0">Centralized Data:</div>
                         <div>
-                            All site data (projects, events, and content) is now managed through the <strong>Archive Repository</strong>. The local <code>metadata.json</code> is only used as a fallback.
+                            All site data (projects, events, and content) is now managed through the <strong>Main Repository</strong>. The local <code>metadata.json</code> is only used as a fallback.
                         </div>
                     </div>
                     <div className="flex gap-2 items-start">
@@ -1316,7 +1316,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                         </li>
                                         <li className="flex gap-2">
                                             <span className="font-bold">2. Auto-Sync:</span>
-                                            While in the Admin Portal, the system will attempt to automatically push your changes to the GitHub Archive repository every 10 seconds after your last edit.
+                                            While in the Admin Portal, the system will attempt to automatically push your changes to the GitHub Main repository every 10 seconds after your last edit.
                                         </li>
                                         <li className="flex gap-2">
                                             <span className="font-bold">3. Manual Push:</span>
@@ -1332,15 +1332,23 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
 
                             <div className="pt-8 border-t border-gray-100">
                                 <h3 className="text-sm font-bold text-contrast mb-4 flex items-center gap-2">
-                                    <Github className="w-4 h-4" /> External Content Strategy
+                                    <Github className="w-4 h-4" /> Repository Configuration
                                 </h3>
                                 <div className="bg-surface rounded-xl p-6 border border-gray-100 space-y-4">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <p className="text-sm font-medium text-contrast">Archive Repository (Single Source of Truth)</p>
-                                            <p className="text-xs text-secondary mt-1">Currently linked to: <code className="bg-gray-100 px-1 rounded">{ARCHIVE_REPO}</code></p>
+                                            <p className="text-sm font-medium text-contrast">Main Repository (Website & Metadata)</p>
+                                            <p className="text-xs text-secondary mt-1">Linked to: <code className="bg-gray-100 px-1 rounded">{MAIN_REPO}</code></p>
                                         </div>
-                                        <div className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase">Active</div>
+                                        <div className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase">Security: Private-capable</div>
+                                    </div>
+
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <p className="text-sm font-medium text-contrast">Archive Repository (Large Media & Logs)</p>
+                                            <p className="text-xs text-secondary mt-1">Linked to: <code className="bg-gray-100 px-1 rounded">{ARCHIVE_REPO}</code></p>
+                                        </div>
+                                        <div className="px-2 py-1 bg-blue-100 text-blue-700 text-[10px] font-bold rounded uppercase">Public Archive</div>
                                     </div>
 
                                     <div className="text-xs text-secondary leading-relaxed bg-white p-4 rounded-lg border border-gray-50">
@@ -1348,14 +1356,14 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ data, updateData, isAdmin, se
                                             <RefreshCw className="w-3 h-3" /> Sync Instructions:
                                         </p>
                                         <ol className="list-decimal list-inside space-y-2">
-                                            <li>Create a folder for each update: <code className="text-primary">/projects/[project-slug]/YYYY-MM-DD-Title/</code></li>
+                                            <li>Create a folder for each update in the <strong>Archive</strong>: <code className="text-primary">/projects/[project-slug]/YYYY-MM-DD-Title/</code></li>
                                             <li>Inside each update folder, add a <code className="text-primary">desc.txt</code> for the log text.</li>
                                             <li>Add images/videos to the same update folder for the gallery.</li>
                                         </ol>
                                     </div>
 
                                     <p className="text-[10px] text-gray-400 italic">
-                                        Note: To change the repository, update the <code>ARCHIVE_REPO</code> constant in <code>constants.ts</code>.
+                                        Note: To change these repositories, update the constants in <code>constants.ts</code>.
                                     </p>
                                 </div>
                             </div>

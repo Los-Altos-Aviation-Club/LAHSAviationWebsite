@@ -10,190 +10,11 @@ import AdminPortal from './components/AdminPortal';
 import Footer from './components/Footer';
 import { ClubData, SiteContent, Project, Meeting, Pillar, Officer, TickerItem, MissionCard } from './types';
 import { Plane } from 'lucide-react';
-import { ARCHIVE_RAW_BASE_URL } from './constants';
+import { MAIN_RAW_BASE_URL } from './constants';
+import metadataImport from './metadata.json';
 
 // --- Mock Data ---
-const INITIAL_DATA: ClubData = {
-    projects: [
-        {
-            id: '1',
-            title: 'High Altitude Rocketry',
-            description: 'Designing and building a dual-deployment rocket capable of reaching 10,000 feet with telemetry logging.',
-            status: 'In Progress',
-            operationalStatus: 'Active',
-            imageUrl: 'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?q=80&w=2070&auto=format&fit=crop',
-            specs: [
-                { label: 'Apogee', value: '10,000ft' },
-                { label: 'Motor', value: 'L-Class' },
-                { label: 'Recovery', value: 'Dual Deploy' }
-            ],
-            estCompletion: 'June 2025'
-        },
-        {
-            id: '2',
-            title: 'Fixed-Wing UAV',
-            description: 'Long-endurance carbon fiber drone for autonomous survey missions and aerial mapping.',
-            status: 'In Progress',
-            operationalStatus: 'Active',
-            imageUrl: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?q=80&w=2070&auto=format&fit=crop',
-            specs: [
-                { label: 'Wingspan', value: '1.8m' },
-                { label: 'Battery', value: '6S 10Ah' },
-                { label: 'Range', value: '15km' }
-            ],
-            estCompletion: 'March 2025'
-        },
-        {
-            id: '3',
-            title: 'Vertical Takeoff System',
-            description: 'Experimental quad-plane hybrid for efficient forward flight and VTOL capabilities.',
-            status: 'Concept',
-            operationalStatus: 'Active',
-            imageUrl: 'https://images.unsplash.com/photo-1473968512647-3e447244af8f?q=80&w=2070&auto=format&fit=crop',
-            specs: [
-                { label: 'Payload', value: '1.5kg' },
-                { label: 'Flight Time', value: '45min' },
-                { label: 'Controller', value: 'ArduPilot' }
-            ],
-            estCompletion: 'Sept 2025'
-        }
-    ],
-    officers: [
-        {
-            id: '1',
-            name: 'Aiden Chen',
-            role: 'President',
-            email: 'aiden@example.com',
-            imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop'
-        },
-        {
-            id: '2',
-            name: 'Maya Rodriguez',
-            role: 'Engineering Lead',
-            email: 'maya@example.com',
-            imageUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2070&auto=format&fit=crop'
-        },
-        {
-            id: '3',
-            name: 'Liam Smith',
-            role: 'Logistics',
-            email: 'liam@example.com',
-            imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=2070&auto=format&fit=crop'
-        }
-    ],
-    meetings: [
-        {
-            id: '1',
-            title: 'Guest Speaker: NASA Engineer',
-            date: '2024-10-15',
-            time: '15:30',
-            location: 'Room 702',
-            description: 'A talk about propulsion systems and internship opportunities.',
-            status: 'Active',
-            imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop'
-        },
-        {
-            id: '2',
-            title: 'Drone Racing Workshop',
-            date: '2024-10-22',
-            time: '16:00',
-            location: 'Football Field',
-            description: 'Hands-on practice with FPV drone piloting.',
-            status: 'Active',
-            imageUrl: 'https://images.unsplash.com/photo-1473968512647-3e447244af8f?q=80&w=2070&auto=format&fit=crop'
-        }
-    ],
-    pillars: [
-        {
-            id: '1',
-            imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop',
-            title: 'Avionics',
-            description: 'Development of custom flight computers, telemetry systems, and autonomous control logic for UAVs.'
-        },
-        {
-            id: '2',
-            imageUrl: 'https://images.unsplash.com/photo-1559067515-bf7d799b6d42?q=80&w=2070&auto=format&fit=crop',
-            title: 'Aerodynamics',
-            description: 'Utilizing CFD analysis and wind tunnel testing to optimize airframe efficiency and stability.'
-        },
-        {
-            id: '3',
-            imageUrl: 'https://images.unsplash.com/photo-1581092921461-eab62e97a782?q=80&w=2070&auto=format&fit=crop',
-            title: 'Crew Training',
-            description: 'Mentorship programs pairing senior engineers with new members to teach CAD, soldering, and piloting.'
-        }
-    ],
-    tickerItems: [
-        { id: '1', label: 'Current Project', value: 'L1 Rocketry', type: 'wind' },
-        { id: '2', label: 'Next Launch', value: 'OCT 25', type: 'zap' },
-        { id: '3', label: 'Members', value: '45+ Active', type: 'users' }
-    ],
-    missionCards: [
-        {
-            id: '1',
-            type: 'icon',
-            icon: 'Plane',
-            title: 'Design',
-            description: 'Learn the principles of aeronautics and use CAD software to design your own airframes.'
-        },
-        {
-            id: '2',
-            type: 'icon',
-            icon: 'Wrench',
-            title: 'Build',
-            description: 'Get hands-on experience with composite materials, electronics, and mechanical assembly.'
-        },
-        {
-            id: '3',
-            type: 'icon',
-            icon: 'Navigation',
-            title: 'Fly',
-            description: 'Take your creations to the skies and analyze flight data to improve performance.'
-        },
-        {
-            id: '4',
-            type: 'image',
-            imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop',
-            title: 'Avionics',
-            description: 'Development of custom flight computers, telemetry systems, and autonomous control logic for UAVs.'
-        },
-        {
-            id: '5',
-            type: 'image',
-            imageUrl: 'https://images.unsplash.com/photo-1559067515-bf7d799b6d42?q=80&w=2070&auto=format&fit=crop',
-            title: 'Aerodynamics',
-            description: 'Utilizing CFD analysis and wind tunnel testing to optimize airframe efficiency and stability.'
-        },
-        {
-            id: '6',
-            type: 'image',
-            imageUrl: 'https://images.unsplash.com/photo-1581092921461-eab62e97a782?q=80&w=2070&auto=format&fit=crop',
-            title: 'Crew Training',
-            description: 'Mentorship programs pairing senior engineers with new members to teach CAD, soldering, and piloting.'
-        }
-    ],
-    siteContent: {
-        homeHeroTitle: 'We Build Things That Fly',
-        homeHeroSubtitle: 'Los Altos High School Aviation Club. Designing drones, rockets, and the next generation of aerospace engineers.',
-        missionTitle: 'Our Mission',
-        missionStatement: 'Bridging the gap between theoretical physics and real-world aerospace engineering through hands-on fabrication and flight testing.',
-        missionTeamTitle: 'Meet the Team',
-        missionTeamSubtitle: 'The pilots, engineers, and dreamers behind the projects.',
-        meetingsTitle: 'Upcoming Meetings',
-        meetingsSubtitle: 'Workshops, launches, and guest speakers.',
-        projectsTitle: 'Active Development',
-        projectsSubtitle: 'Current engineering efforts in rocketry, fixed-wing aircraft, and multi-rotor systems.',
-        projectsMarquee: '/// Project Access',
-        contactTitle: 'Clear for Takeoff?',
-        contactSubtitle: 'We are looking for students passionate about engineering, design, and flight. No prior experience is required—just curiosity.',
-        navbarTitle: 'LAHS',
-        navbarSubtitle: 'Aviation Club',
-        marqueeText: 'Welcome to the Los Altos High School Aviation Club • Join us every Tuesday in Room 702 • Engineering the future of flight • Blue Skies Ahead',
-        meetingsMarquee: '/// Logbook'
-    },
-    googleCalendarUrl: 'https://calendar.google.com',
-    discordUrl: 'https://discord.gg/example'
-};
+const INITIAL_DATA: ClubData = metadataImport as unknown as ClubData;
 
 const ScrollToTop = () => {
     const { pathname } = useLocation();
@@ -271,60 +92,82 @@ const MainContent: React.FC = () => {
                     }
                 }
 
-                const response = await fetch(`${ARCHIVE_RAW_BASE_URL}/metadata.json`);
-                if (response.ok) {
-                    const remoteData = await response.json();
-                    const sanitizedRemoteData = sanitizeClubData(remoteData);
+                // Initial data from metadata.json (now via INITIAL_DATA)
+                const metaTimestamp = INITIAL_DATA.lastUpdated ? new Date(INITIAL_DATA.lastUpdated).getTime() : 0;
 
-                    const remoteTimestamp = sanitizedRemoteData.lastUpdated ? new Date(sanitizedRemoteData.lastUpdated).getTime() : 0;
+                let remoteData: ClubData | null = null;
+                let remoteTimestamp = 0;
 
-                    const finalData = (localData && localTimestamp > remoteTimestamp) ? localData : sanitizedRemoteData;
-
-                    // Auto-pruning logic: Filter out meetings older than current date
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-
-                    const filteredMeetings = (finalData.meetings || []).filter((m: Meeting) => {
-                        const meetingDate = new Date(m.date);
-                        // Ensure date is valid before filtering
-                        if (isNaN(meetingDate.getTime())) return true;
-                        meetingDate.setHours(0, 0, 0, 0);
-                        return meetingDate >= today;
-                    });
-
-                    // Deep merge remote data with initial data to prevent missing field crashes
-                    setData(prev => {
-                        const mergedProjects = (finalData.projects || prev.projects).map((p: Project) => ({
-                            ...p,
-                            specs: p.specs || [],
-                            operationalStatus: p.operationalStatus || 'Active'
-                        }));
-
-                        return {
-                            ...prev,
-                            ...finalData,
-                            siteContent: {
-                                ...prev.siteContent,
-                                ...(finalData.siteContent || {})
-                            },
-                            // Ensure arrays exist if remote data is partial
-                            projects: mergedProjects,
-                            officers: finalData.officers || prev.officers,
-                            meetings: filteredMeetings.length > 0 ? filteredMeetings : (finalData.meetings || prev.meetings),
-                            pillars: finalData.pillars || prev.pillars,
-                            tickerItems: finalData.tickerItems || prev.tickerItems,
-                            missionCards: finalData.missionCards || prev.missionCards || []
-                        };
-                    });
-
-                    setIsArchiveLoaded(true);
-                    console.log('Loaded data from ' + (localData && localTimestamp > remoteTimestamp ? 'LocalStorage' : 'Archive Repository'));
-                } else {
-                    console.warn('Failed to fetch metadata from Archive, using local or initial data');
-                    if (localData) {
-                        setData(localData);
+                try {
+                    const response = await fetch(`${MAIN_RAW_BASE_URL}/metadata.json`);
+                    if (response.ok) {
+                        remoteData = await response.json();
+                        if (remoteData) {
+                            remoteData = sanitizeClubData(remoteData);
+                            remoteTimestamp = remoteData.lastUpdated ? new Date(remoteData.lastUpdated).getTime() : 0;
+                        }
                     }
+                } catch (e) {
+                    console.warn('Failed to fetch from Main Repo, using local or initial data');
                 }
+
+                // Prioritization: Most recent of (LocalStorage, Main Repo, metadata.json)
+                let finalData: ClubData = INITIAL_DATA;
+                let finalTimestamp = metaTimestamp;
+                let source = 'metadata.json';
+
+                if (remoteData && remoteTimestamp > finalTimestamp) {
+                    finalData = remoteData;
+                    finalTimestamp = remoteTimestamp;
+                    source = 'Main Repo';
+                }
+
+                if (localData && localTimestamp > finalTimestamp) {
+                    finalData = localData;
+                    finalTimestamp = localTimestamp;
+                    source = 'LocalStorage';
+                }
+
+                // Auto-pruning logic: Filter out meetings older than current date
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const filteredMeetings = (finalData.meetings || []).filter((m: Meeting) => {
+                    const meetingDate = new Date(m.date);
+                    if (isNaN(meetingDate.getTime())) return true;
+                    meetingDate.setHours(0, 0, 0, 0);
+                    return meetingDate >= today;
+                });
+
+                // Deep merge with initial data to prevent missing field crashes
+                setData(prev => {
+                    const mergedProjects = (finalData.projects || prev.projects).map((p: Project) => ({
+                        ...p,
+                        specs: p.specs || [],
+                        operationalStatus: p.operationalStatus || 'Active'
+                    }));
+
+                    return {
+                        ...prev,
+                        ...finalData,
+                        siteContent: {
+                            ...prev.siteContent,
+                            ...(finalData.siteContent || {})
+                        },
+                        projects: mergedProjects,
+                        officers: finalData.officers || prev.officers,
+                        meetings: filteredMeetings.length > 0 ? filteredMeetings : (finalData.meetings || prev.meetings),
+                        pillars: finalData.pillars || prev.pillars,
+                        tickerItems: finalData.tickerItems || prev.tickerItems,
+                        missionCards: finalData.missionCards || prev.missionCards || []
+                    };
+                });
+
+                if (source === 'Main Repo') {
+                    setIsArchiveLoaded(true);
+                }
+                console.log(`Loaded data from ${source}`);
+
             } catch (error) {
                 console.error('Error fetching metadata:', error);
             } finally {
