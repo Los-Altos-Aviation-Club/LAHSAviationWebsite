@@ -4,17 +4,17 @@
     "meetings": [],
     "siteContent": {
         "homeHeroTitle": "We Build Things That Fly",
-        "homeHeroSubtitle": "Los Altos High School Aviation Club. Designing drones, rockets, and the next generation of aerospace engineers.",
+        "homeHeroSubtitle": "Los Altos High School Aviation Club. Designing drones, rockets, planes, and inspiring students",
         "missionTitle": "Our Mission",
-        "missionStatement": "Bridging the gap between theoretical physics and real-world aerospace engineering through hands-on fabrication and flight testing.",
+        "missionStatement": "Bridging the gap between the theoretical and real-world engineering through hands-on fabrication and flight testing.",
         "missionTeamTitle": "Meet the Team",
-        "missionTeamSubtitle": "The pilots, engineers, and dreamers behind the projects.",
+        "missionTeamSubtitle": "The people behind the projects.",
         "meetingsTitle": "Upcoming Meetings",
-        "meetingsSubtitle": "Workshops, launches, and guest speakers.",
+        "meetingsSubtitle": "Workshops, launches, activities, simulations, and more.",
         "projectsTitle": "Active Development",
         "projectsSubtitle": "Current engineering efforts in rocketry, fixed-wing aircraft, and multi-rotor systems.",
         "projectsMarquee": "/// Project Access",
-        "contactTitle": "Clear for Takeoff?",
+        "contactTitle": "Want to Contact Us?",
         "contactSubtitle": "We are looking for students passionate about engineering, design, and flight. No prior experience is required—just curiosity.",
         "navbarTitle": "LAHS",
         "navbarSubtitle": "Aviation Club",
@@ -57,7 +57,7 @@
         {
             "id": "3",
             "label": "Members",
-            "value": "45+ Active",
+            "value": "40+",
             "type": "users"
         }
     ],
@@ -82,5 +82,5 @@
         }
     ],
     "googleCalendarUrl": "https://calendar.google.com",
-    "discordUrl": "https://discord.gg/example"
+    "discordUrl": "https://discord.gg/CfjDdfX5AY"
 }
