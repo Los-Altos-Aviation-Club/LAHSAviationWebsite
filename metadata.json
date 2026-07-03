@@ -1,87 +1,149 @@
 {
-    "projects": [],
-    "officers": [],
-    "meetings": [],
-    "siteContent": {
-        "homeHeroTitle": "We Build Things That Fly",
-        "homeHeroSubtitle": "Los Altos High School Aviation Club. Designing drones, rockets, planes, and inspiring students",
-        "missionTitle": "Our Mission",
-        "missionStatement": "Bridging the gap between the theoretical and real-world engineering through hands-on fabrication and flight testing.",
-        "missionTeamTitle": "Meet the Team",
-        "missionTeamSubtitle": "The people behind the projects.",
-        "meetingsTitle": "Upcoming Meetings",
-        "meetingsSubtitle": "Workshops, launches, activities, simulations, and more.",
-        "projectsTitle": "Active Development",
-        "projectsSubtitle": "Current engineering efforts in rocketry, fixed-wing aircraft, and multi-rotor systems.",
-        "projectsMarquee": "/// Project Access",
-        "contactTitle": "Want to Contact Us?",
-        "contactSubtitle": "We are looking for students passionate about engineering, design, and flight. No prior experience is required—just curiosity.",
-        "navbarTitle": "LAHS",
-        "navbarSubtitle": "Aviation Club",
-        "marqueeText": "Welcome to the Los Altos High School Aviation Club • Join us every Tuesday in Room 702 • Engineering the future of flight • Blue Skies Ahead",
-        "meetingsMarquee": "/// Logbook"
+  "projects": [
+    {
+      "id": "1783121832101",
+      "title": "Drone Project",
+      "description": "Project description goes here.",
+      "status": "In Progress",
+      "operationalStatus": "Active",
+      "imageUrl": "https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2070&auto=format&fit=crop",
+      "specs": [
+        {
+          "label": "Apogee",
+          "value": "TBD"
+        },
+        {
+          "label": "Motor",
+          "value": "TBD"
+        },
+        {
+          "label": "Recovery",
+          "value": "TBD"
+        }
+      ],
+      "estCompletion": "2027"
     },
-    "pillars": [
+    {
+      "id": "1783121878833",
+      "title": "L1 Rocket",
+      "description": "Project description goes here.",
+      "status": "Completed",
+      "operationalStatus": "Completed",
+      "imageUrl": "https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2070&auto=format&fit=crop",
+      "specs": [
         {
-            "id": "1",
-            "imageUrl": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop",
-            "title": "Avionics",
-            "description": "Development of custom flight computers, telemetry systems, and autonomous control logic for UAVs."
+          "label": "Apogee",
+          "value": "TBD"
         },
         {
-            "id": "2",
-            "imageUrl": "https://images.unsplash.com/photo-1559067515-bf7d799b6d42?q=80&w=2070&auto=format&fit=crop",
-            "title": "Aerodynamics",
-            "description": "Utilizing CFD analysis and wind tunnel testing to optimize airframe efficiency and stability."
+          "label": "Motor",
+          "value": "TBD"
         },
         {
-            "id": "3",
-            "imageUrl": "https://images.unsplash.com/photo-1581092921461-eab62e97a782?q=80&w=2070&auto=format&fit=crop",
-            "title": "Crew Training",
-            "description": "Mentorship programs pairing senior engineers with new members to teach CAD, soldering, and piloting."
+          "label": "Recovery",
+          "value": "TBD"
         }
-    ],
-    "tickerItems": [
-        {
-            "id": "1",
-            "label": "Current Project",
-            "value": "L1 Rocketry",
-            "type": "wind"
-        },
-        {
-            "id": "2",
-            "label": "Next Launch",
-            "value": "OCT 25",
-            "type": "zap"
-        },
-        {
-            "id": "3",
-            "label": "Members",
-            "value": "40+",
-            "type": "users"
-        }
-    ],
-    "featureBoxes": [
-        {
-            "id": "1",
-            "icon": "Plane",
-            "title": "Design",
-            "description": "Learn the principles of aeronautics and use CAD software to design your own airframes."
-        },
-        {
-            "id": "2",
-            "icon": "Wrench",
-            "title": "Build",
-            "description": "Get hands-on experience with composite materials, electronics, and mechanical assembly."
-        },
-        {
-            "id": "3",
-            "icon": "Navigation",
-            "title": "Fly",
-            "description": "Take your creations to the skies and analyze flight data to improve performance."
-        }
-    ],
-    "googleCalendarUrl": "https://calendar.google.com",
-    "discordUrl": "https://discord.gg/CfjDdfX5AY",
-    "lastUpdated": "2026-01-06T21:30:00.000Z"
+      ],
+      "estCompletion": "2025"
+    }
+  ],
+  "officers": [
+    {
+      "id": "1783121959428",
+      "name": "Rhagav",
+      "role": "Officer",
+      "email": "email@example.com"
+    },
+    {
+      "id": "1783121968660",
+      "name": "Manxuan",
+      "role": "Retired Officer",
+      "email": "email@example.com"
+    }
+  ],
+  "meetings": [],
+  "siteContent": {
+    "homeHeroTitle": "We Build Things That Fly",
+    "homeHeroSubtitle": "Los Altos High School Aviation Club. Designing drones, rockets, planes, and inspiring students",
+    "missionTitle": "Our Mission",
+    "missionStatement": "Bridging the gap between the theoretical and real-world engineering through hands-on fabrication and flight testing.",
+    "missionTeamTitle": "Meet the Team",
+    "missionTeamSubtitle": "The people behind the projects.",
+    "meetingsTitle": "Upcoming Meetings",
+    "meetingsSubtitle": "Workshops, launches, activities, simulations, and more.",
+    "projectsTitle": "Active Development",
+    "projectsSubtitle": "Current engineering efforts in rocketry, fixed-wing aircraft, and multi-rotor systems.",
+    "projectsMarquee": "/// Project Access",
+    "contactTitle": "Want to Contact Us?",
+    "contactSubtitle": "We are looking for students passionate about engineering, design, and flight. No prior experience is required—just curiosity.",
+    "navbarTitle": "LAHS",
+    "navbarSubtitle": "Aviation Club",
+    "marqueeText": "Welcome to the Los Altos High School Aviation Club • Join us every Tuesday in Room 702 • Engineering the future of flight • Blue Skies Ahead",
+    "meetingsMarquee": "/// Logbook",
+    "missionBannerUrl": "https://images.unsplash.com/photo-1464746109676-23191284eb3b?q=80&w=2072&auto=format&fit=crop"
+  },
+  "pillars": [
+    {
+      "id": "1",
+      "imageUrl": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop",
+      "title": "Avionics",
+      "description": "Development of custom flight computers, telemetry systems, and autonomous control logic for UAVs."
+    },
+    {
+      "id": "2",
+      "imageUrl": "https://images.unsplash.com/photo-1559067515-bf7d799b6d42?q=80&w=2070&auto=format&fit=crop",
+      "title": "Aerodynamics",
+      "description": "Utilizing CFD analysis and wind tunnel testing to optimize airframe efficiency and stability."
+    },
+    {
+      "id": "3",
+      "imageUrl": "https://images.unsplash.com/photo-1581092921461-eab62e97a782?q=80&w=2070&auto=format&fit=crop",
+      "title": "Crew Training",
+      "description": "Mentorship programs pairing senior engineers with new members to teach CAD, soldering, and piloting."
+    }
+  ],
+  "tickerItems": [
+    {
+      "id": "1",
+      "label": "Current Project",
+      "value": "L1 Rocketry",
+      "type": "wind"
+    },
+    {
+      "id": "2",
+      "label": "Next Launch",
+      "value": "OCT 25",
+      "type": "zap"
+    },
+    {
+      "id": "3",
+      "label": "Members",
+      "value": "40+",
+      "type": "users"
+    }
+  ],
+  "featureBoxes": [
+    {
+      "id": "1",
+      "icon": "Plane",
+      "title": "Design",
+      "description": "Learn the principles of aeronautics and use CAD software to design your own airframes."
+    },
+    {
+      "id": "2",
+      "icon": "Wrench",
+      "title": "Build",
+      "description": "Get hands-on experience with composite materials, electronics, and mechanical assembly."
+    },
+    {
+      "id": "3",
+      "icon": "Navigation",
+      "title": "Fly",
+      "description": "Take your creations to the skies and analyze flight data to improve performance."
+    }
+  ],
+  "googleCalendarUrl": "https://calendar.google.com",
+  "discordUrl": "https://discord.gg/CfjDdfX5AY",
+  "lastUpdated": "2026-07-03T23:53:15.411Z",
+  "missionCards": []
 }
