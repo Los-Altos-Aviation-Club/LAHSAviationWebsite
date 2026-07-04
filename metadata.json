@@ -17,10 +17,6 @@
           "value": "4x330kv"
         },
         {
-          "label": "Camera",
-          "value": "arducam"
-        },
-        {
           "label": "GPS",
           "value": "M9N GPS"
         },
@@ -156,6 +152,6 @@
   ],
   "googleCalendarUrl": "https://calendar.google.com",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-04T00:46:58.544Z",
+  "lastUpdated": "2026-07-04T00:48:05.585Z",
   "missionCards": []
 }
