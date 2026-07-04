@@ -40,8 +40,12 @@
           "value": "F20W"
         },
         {
-          "label": "Recovery",
+          "label": "Altimeter",
           "value": "TBD"
+        },
+        {
+          "label": "Heat shield",
+          "value": ""
         }
       ],
       "estCompletion": "2025"
@@ -144,6 +148,6 @@
   ],
   "googleCalendarUrl": "https://calendar.google.com",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-04T00:31:50.690Z",
+  "lastUpdated": "2026-07-04T00:33:13.593Z",
   "missionCards": []
 }
