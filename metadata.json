@@ -9,7 +9,7 @@
       "imageUrl": "https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2070&auto=format&fit=crop",
       "specs": [
         {
-          "label": "Apogee",
+          "label": "Flight Controler",
           "value": "TBD"
         },
         {
@@ -148,6 +148,6 @@
   ],
   "googleCalendarUrl": "https://calendar.google.com",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-04T00:33:13.593Z",
+  "lastUpdated": "2026-07-04T00:33:58.321Z",
   "missionCards": []
 }
