@@ -3,7 +3,7 @@
     {
       "id": "1783121832101",
       "title": "Drone Project",
-      "description": "",
+      "description": "The Aviation Club is developing a multipurpose quadrotor drone to serve as a medical response proof-of-concept and a platform for machine learning research. During the initial design phase, the team ran simulations to verify component compatibility, flight time, and payload capacity. Members created a custom CAD model to calculate the center of gravity and ensure the drone could modularly accept different payloads. To fund manufacturing, club officers presented to the PTSA and secured a grant of over 700 dollars. The drone was assembled using a combination of outsourced carbon fiber parts and components manufactured using the high school's 3D printers.  \n\nThis is an active, ongoing project. As of the summer of 2026, the team is currently around stage three and moving into stage four. Stage three focuses on initial flight tests to safely tune the flight controller and make necessary hardware and software modifications. The club plans to request authorization from school administrators to conduct these test flights on campus without a payload. As the team advances into the final application phase, the project will likely be completed by 2027.  \n\nOnce the platform is deemed safe for use, the team will proceed with its stage four applications. The first objective tests a medical configuration designed to provide real-time injury assessments using AI diagnostic systems and deliver medication via a custom attachment. The second objective utilizes the drone for machine learning research, specifically evaluating how real flight telemetry and camera distortions impact the accuracy of object detection models.",
       "status": "In Progress",
       "operationalStatus": "Active",
       "imageUrl": "https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2070&auto=format&fit=crop",
@@ -148,6 +148,6 @@
   ],
   "googleCalendarUrl": "https://calendar.google.com",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-04T00:35:11.169Z",
+  "lastUpdated": "2026-07-04T00:41:03.444Z",
   "missionCards": []
 }
