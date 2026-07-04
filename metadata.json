@@ -41,11 +41,11 @@
         },
         {
           "label": "Altimeter",
-          "value": "TBD"
+          "value": "firefly"
         },
         {
           "label": "Heat shield",
-          "value": ""
+          "value": "Apogee 9in Parachute Protector"
         }
       ],
       "estCompletion": "2025"
@@ -148,6 +148,6 @@
   ],
   "googleCalendarUrl": "https://calendar.google.com",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-04T00:33:58.321Z",
+  "lastUpdated": "2026-07-04T00:34:51.540Z",
   "missionCards": []
 }
