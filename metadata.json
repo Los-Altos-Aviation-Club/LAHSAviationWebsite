@@ -19,6 +19,10 @@
         {
           "label": "Recovery",
           "value": "TBD"
+        },
+        {
+          "label": "GPS",
+          "value": ""
         }
       ],
       "estCompletion": "2027"
@@ -148,6 +152,6 @@
   ],
   "googleCalendarUrl": "https://calendar.google.com",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-04T00:43:09.662Z",
+  "lastUpdated": "2026-07-04T00:43:25.140Z",
   "missionCards": []
 }
