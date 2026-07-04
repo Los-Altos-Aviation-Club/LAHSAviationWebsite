@@ -168,8 +168,8 @@
       "description": "Take your creations to the skies and analyze flight data to improve performance."
     }
   ],
-  "googleCalendarUrl": "https://calendar.google.com",
+  "googleCalendarUrl": "<iframe src=\"https://calendar.google.com/calendar/embed?src=losaltosaviationclub%40gma",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-04T00:52:49.766Z",
+  "lastUpdated": "2026-07-04T00:54:03.649Z",
   "missionCards": []
 }
