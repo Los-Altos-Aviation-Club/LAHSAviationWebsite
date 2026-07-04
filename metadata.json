@@ -17,8 +17,8 @@
           "value": "4x330kv"
         },
         {
-          "label": "CC",
-          "value": "TBD"
+          "label": "Camera",
+          "value": "arducam"
         },
         {
           "label": "GPS",
@@ -152,6 +152,6 @@
   ],
   "googleCalendarUrl": "https://calendar.google.com",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-04T00:45:51.287Z",
+  "lastUpdated": "2026-07-04T00:46:10.386Z",
   "missionCards": []
 }
