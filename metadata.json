@@ -67,6 +67,12 @@
       "name": "Manxuan",
       "role": "Retired Officer",
       "email": "email@example.com"
+    },
+    {
+      "id": "1783126316508",
+      "name": "Rodin",
+      "role": "Officer",
+      "email": "email@example.com"
     }
   ],
   "meetings": [],
@@ -152,6 +158,6 @@
   ],
   "googleCalendarUrl": "https://calendar.google.com",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-04T00:51:09.777Z",
+  "lastUpdated": "2026-07-04T00:52:11.150Z",
   "missionCards": []
 }
