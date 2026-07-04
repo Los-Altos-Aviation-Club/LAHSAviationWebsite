@@ -41,7 +41,7 @@
         },
         {
           "label": "Altimeter",
-          "value": "firefly"
+          "value": "FireFly"
         },
         {
           "label": "Heat shield",
@@ -148,6 +148,6 @@
   ],
   "googleCalendarUrl": "https://calendar.google.com",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-04T00:34:51.540Z",
+  "lastUpdated": "2026-07-04T00:35:05.579Z",
   "missionCards": []
 }
