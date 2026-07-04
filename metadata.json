@@ -10,7 +10,7 @@
       "specs": [
         {
           "label": "Flight Controler",
-          "value": "TBD"
+          "value": "CUAV v5 NANO Pixhawk 6c Mini"
         },
         {
           "label": "Motor",
@@ -148,6 +148,6 @@
   ],
   "googleCalendarUrl": "https://calendar.google.com",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-04T00:41:03.444Z",
+  "lastUpdated": "2026-07-04T00:43:09.662Z",
   "missionCards": []
 }
