@@ -152,6 +152,15 @@
   ],
   "googleCalendarUrl": "https://calendar.google.com",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-04T00:48:39.720Z",
-  "missionCards": []
+  "lastUpdated": "2026-07-04T00:50:02.069Z",
+  "missionCards": [
+    {
+      "id": "1783126191768",
+      "type": "icon",
+      "icon": "Plane",
+      "title": "New Card",
+      "description": "Card description goes here.",
+      "imageUrl": ""
+    }
+  ]
 }
