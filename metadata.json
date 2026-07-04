@@ -14,10 +14,10 @@
         },
         {
           "label": "Motor",
-          "value": "TBD"
+          "value": "4x330kv"
         },
         {
-          "label": "Recovery",
+          "label": "CC",
           "value": "TBD"
         },
         {
@@ -152,6 +152,6 @@
   ],
   "googleCalendarUrl": "https://calendar.google.com",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-04T00:43:40.017Z",
+  "lastUpdated": "2026-07-04T00:45:51.287Z",
   "missionCards": []
 }
