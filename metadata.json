@@ -26,7 +26,7 @@
     {
       "id": "1783121878833",
       "title": "L1 Rocket",
-      "description": "Project description goes here.",
+      "description": "The Aviation Club designed and built a rocket for the 2025 American Rocketry Challenge. The objective was to launch two eggs to an altitude of 750 feet and return them safely within 36 to 39 seconds. Members collaborated on the design and assembled the rocket themselves, which included laser-cutting the parts. Once completed, a group of club officers drove three hours to the LUNAR launch site at Snow Ranch for testing.\n\nThe first test run was a success. For recovery, the rocket was designed to descend in two sections: one containing the engine, and the upper section housing the altimeter and the two eggs. Unfortunately, during the second run, the entire upper section containing both the altimeter and the eggs was lost. Because the competition requires two successful runs to qualify, the team was disqualified. A later review identified several issues throughout the project, including parachute problems caused by misreading the rules, an altered center of gravity due to mistakenly using cooked eggs instead of raw ones, delays in purchasing parts, and delays in collecting signed competition forms from all members. The team will use these setbacks to improve future design planning.The Aviation Club designed and built a rocket for the 2025 American Rocketry Challenge. The objective was to launch two eggs to an altitude of 750 feet and return them safely within 36 to 39 seconds. Members collaborated on the design and assembled the rocket themselves, which included laser-cutting the parts. Once completed, a group of club officers drove three hours to the LUNAR launch site at Snow Ranch for testing.\n\nThe first test run was a success. For recovery, the rocket was designed to descend in two sections: one containing the engine, and the upper section housing the altimeter and the two eggs. Unfortunately, during the second run, the entire upper section containing both the altimeter and the eggs was lost. Because the competition requires two successful runs to qualify, the team was disqualified. A later review identified several issues throughout the project, including parachute problems caused by misreading the rules, an altered center of gravity due to mistakenly using cooked eggs instead of raw ones, delays in purchasing parts, and delays in collecting signed competition forms from all members. The team will use these setbacks to improve future design planning.",
       "status": "Completed",
       "operationalStatus": "Completed",
       "imageUrl": "https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2070&auto=format&fit=crop",
@@ -144,6 +144,6 @@
   ],
   "googleCalendarUrl": "https://calendar.google.com",
   "discordUrl": "https://discord.gg/CfjDdfX5AY",
-  "lastUpdated": "2026-07-03T23:55:00.601Z",
+  "lastUpdated": "2026-07-04T00:30:23.363Z",
   "missionCards": []
 }
